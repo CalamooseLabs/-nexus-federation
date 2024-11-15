@@ -1,0 +1,43 @@
+{
+  "name": "@herd/herd",
+  "description": "A lightweight JSX router and SSR/CSR renderer for Deno, inspired by module federation. It enables easy micro frontend setups, offering an intuitive API for modular architectures without complex configurations, perfect for streamlined Deno projects.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./types": "./types.ts"
+  },
+  "publish": {
+    "include": [
+      "deno.jsonc",
+      "mod.ts",
+      "types.ts",
+      "import_map.json",
+      "README.md",
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "static/**/*"
+    ]
+  },
+  "tasks": {
+    "start": "deno serve --lock app.tsx",
+    "dev": "deno serve -A --port 8001 --reload --watch main.tsx",
+    "check": "deno check ./src/**/*.ts",
+    "check-examples": "deno check ./examples/**/*.ts",
+    "check-hono": "deno check ./examples/hono/main.ts",
+    "check-oak": "deno check ./examples/oak/main.ts",
+    "check-fresh": "deno check ./examples/fresh/main.ts",
+    "check-express": "deno check ./examples/expressjs/main.ts"
+  },
+  "importMap": "./import_map.json",
+  "compilerOptions": {
+    "types": [
+      "./types.d.ts",
+      "./src/loader/loader.d.ts",
+      "./src/builder/builder.d.ts",
+      "./src/router/router.d.ts",
+      "./src/app/app.d.ts"
+    ]
+  },
+  "lock": false
+}
