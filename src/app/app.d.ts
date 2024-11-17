@@ -59,7 +59,9 @@ interface Context {
   response?: MinResponse;
   next?: MiddlewareNext;
   body?: HTTPBody | HTTPBodyFunction;
-  send?: (options: SendOptions) => Promise<void | Response | string> | void | Response | string;
+  send?: (
+    options: SendOptions,
+  ) => Promise<void | Response | string> | void | Response | string;
   url?: string | URL;
   method?: string;
 }

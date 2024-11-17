@@ -64,7 +64,7 @@ class App {
       uri = url instanceof URL ? url : new URL(url);
       pathname = uri.pathname;
     } catch (_e) {
-      if (typeof url === 'string' && url.trim() !== '') {
+      if (typeof url === "string" && url.trim() !== "") {
         pathname = url;
       } else {
         throw new Error("Federation Error: URL is blank");
@@ -186,12 +186,12 @@ class App {
         resp.headers = value;
       },
     });
-    AppContext.send = (() => {
+    AppContext.send = () => {
       if (resp.send) resp.send(AppContext.body as string);
       return new Response(AppContext.body as string, {
         status: AppContext.status,
       });
-    });
+    };
 
     return AppContext;
   }
@@ -281,7 +281,7 @@ class App {
       }
       pathname = url.toString();
     }
-    
+
     const method: string | undefined =
       ("req" in reqOrCtx ? reqOrCtx.req?.method : undefined) ??
         ("request" in reqOrCtx ? reqOrCtx.request?.method : undefined) ??
