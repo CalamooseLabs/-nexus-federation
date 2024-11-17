@@ -24,10 +24,12 @@
     "dev": "deno serve -A --port 8001 --reload --watch main.tsx",
     "check": "deno check ./src/**/*.ts",
     "check-examples": "deno check ./examples/**/*.ts",
-    "check-hono": "deno check ./examples/hono/main.ts",
-    "check-oak": "deno check ./examples/oak/main.ts",
-    "check-fresh": "deno check ./examples/fresh/main.ts",
-    "check-express": "deno check ./examples/expressjs/main.ts"
+    "unit-tests": "deno test ./src/**/*.test.ts --filter Unit --allow-read",
+    "unit-tests-coverage": "deno run -A ./coverage/getCoverage.ts --unit",
+    "integration-tests": "deno test ./src/**/*.test.ts --filter Integration --allow-read --allow-env --allow-net",
+    "integration-tests-coverage": "deno run -A ./coverage/getCoverage.ts --integration",
+    "all-tests": "deno test ./src/**/*.test.ts --allow-read --allow-env --allow-net",
+    "all-tests-coverage": "deno run -A ./coverage/getCoverage.ts --all"
   },
   "importMap": "./import_map.json",
   "compilerOptions": {

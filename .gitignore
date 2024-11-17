@@ -4,3 +4,9 @@
 .env.test.local
 .env.production.local
 .env.local
+coverage/unit-tests/*
+coverage/unit-tests/.gitkeep
+coverage/integration-tests/*
+coverage/integration-tests/.gitkeep
+coverage/all-tests/*
+coverage/all-tests/.gitkeep

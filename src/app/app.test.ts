@@ -3,6 +3,24 @@ import { assertEquals } from "jsr:@std/assert";
 
 const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
 
+Deno.test("Unit Tests:", async (subtest) => {
+  const herd = new HerdApp();
+  
+  await subtest.step("Constructor - No Arguments", () => {
+    assertEquals(herd instanceof HerdApp, true);
+  });
+
+  await subtest.step("Constructor - With Arguments", () => {
+    const herd = new HerdApp({
+      basePath: "/_doesntmatter",
+      version: "1.0.0",
+      remoteMap: {},
+    });
+
+    assertEquals(herd instanceof HerdApp, true);
+  });
+});
+
 Deno.test("Integration Tests:", async (task) => {
   const herd = new HerdApp();
   const middleware = herd.middleware;
