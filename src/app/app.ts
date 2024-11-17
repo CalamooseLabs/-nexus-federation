@@ -29,7 +29,7 @@ class App {
 
     this.#builder = new Builder();
     this.#config = new Config(config);
-    this.#handler = new Handler("./routes", this.#config.basePath);
+    this.#handler = new Handler(new URL("./routes", import.meta.url), this.#config.basePath);
 
     this.middleware = this.#middleware.bind(this);
 

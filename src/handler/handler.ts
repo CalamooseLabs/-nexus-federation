@@ -1,11 +1,14 @@
 class Handler {
   #basePath: string;
+  #dirURL: URL;
   #dirPath: string;
   #routes!: Routes;
 
-  constructor(dirPath: string = "./routes", basePath: string = "/_federation") {
+  constructor(dirURL: URL, basePath: string = "/_federation") {
     this.#basePath = basePath;
-    this.#dirPath = new URL(dirPath, import.meta.url).pathname;
+    this.#dirURL = dirURL;
+    this.#dirPath = dirURL.pathname;
+
     this.#setupRoutes();
   }
 
@@ -16,11 +19,10 @@ class Handler {
    */
   async #setupRoutes(): Promise<void> {
     this.#routes = {};
-    // Get all .ts files from the directory
-    const dirURL = new URL(this.#dirPath, import.meta.url);
 
+    // Get all .ts files from the directory
     try {
-      for await (const entry of Deno.readDir(dirURL)) {
+      for await (const entry of Deno.readDir(this.#dirURL)) {
         if (!entry.isFile || !entry.name.endsWith(".ts")) continue;
 
         // Generate the route path by combining basePath with filename (minus .ts)
