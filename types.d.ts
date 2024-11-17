@@ -2,6 +2,10 @@ type Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
 
+type NonOptional<T> = {
+  [P in keyof T]-?: T[P];
+};
+
 type NumberPart = `${number}`;
 type PreReleasePart = `-${string}`;
 type BuildMetadataPart = `+${string}`;

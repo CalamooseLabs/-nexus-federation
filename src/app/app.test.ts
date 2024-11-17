@@ -1,10 +1,10 @@
-import Herd from "./app.ts";
+import { App as HerdApp } from "#app";
 import { assertEquals } from "jsr:@std/assert";
 
 const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
 
 Deno.test("Integration Tests:", async (task) => {
-  const herd = new Herd();
+  const herd = new HerdApp();
   const middleware = herd.middleware;
 
   const BASE_PORT = 8123;
@@ -43,7 +43,11 @@ Deno.test("Integration Tests:", async (task) => {
 
       await withHTTP(() => {
         const controller = new AbortController();
-        Deno.serve({ port: currentPort, signal: controller.signal, onListen: () => {} }, app.fetch);
+        Deno.serve({
+          port: currentPort,
+          signal: controller.signal,
+          onListen: () => {},
+        }, app.fetch);
         return {
           close: () => controller.abort(),
         };
@@ -57,7 +61,11 @@ Deno.test("Integration Tests:", async (task) => {
 
       await withHTTP(() => {
         const controller = new AbortController();
-        Deno.serve({ port: currentPort, signal: controller.signal, onListen: () => {} }, app.fetch);
+        Deno.serve({
+          port: currentPort,
+          signal: controller.signal,
+          onListen: () => {},
+        }, app.fetch);
         return {
           close: () => controller.abort(),
         };

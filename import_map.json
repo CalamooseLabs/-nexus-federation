@@ -1,8 +1,12 @@
 {
   "imports": {
-    "@std/fs": "jsr:@std/fs@^1.0.5",
+    "#app": "./src/app/mod.ts",
+    "#builder": "./src/builder/mod.ts",
+    "#config": "./src/config/mod.ts",
+    "#handler": "./src/handler/mod.ts",
+    "#loader": "./src/loader/mod.ts",
+    "#router": "./src/router/mod.ts",
     "@std/jsonc": "jsr:@std/jsonc@^1.0.1",
-    "@std/uuid": "jsr:@std/uuid@^1.0.4",
     "@deno/emit": "jsr:@deno/emit@^0.46.0"
   }
 }

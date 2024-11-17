@@ -109,4 +109,4 @@ class Router implements Router {
   // }
 }
 
-export default Router;
+export { Router };

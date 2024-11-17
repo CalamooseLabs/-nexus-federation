@@ -1,8 +1,7 @@
-import { walk } from "@std/fs";
-import { v1 as uuidv1 } from "@std/uuid";
-
-import Loader from "../loader/loader.ts";
-import DefaultConfig from "./config.default.ts";
+import { Loader } from "#loader";
+import { Handler } from "#handler";
+import { Config } from "#config";
+import { Builder } from "#builder";
 
 /**
  * App class handles routing and middleware functionality for the federation framework.
@@ -16,19 +15,22 @@ class App {
   middleware = this.#middleware;
 
   // Private instance properties
+  #builder: Builder;
   #config: Config;
+  #handler: Handler;
   #instance_id: UUID;
-  #routes!: Routes;
 
   /**
    * Creates a new App instance with optional configuration.
-   * @param {Config} [config] - Optional configuration object
+   * @param {HerdConfig} [config] - Optional configuration object
    */
-  constructor(config?: Config) {
-    this.#instance_id = uuidv1.generate() as UUID;
-    this.#config = config ?? DefaultConfig;
+  constructor(config?: HerdConfig) {
+    this.#instance_id = crypto.randomUUID();
 
-    this.#setupRoutes();
+    this.#builder = new Builder();
+    this.#config = new Config(config);
+    this.#handler = new Handler("./routes", this.#config.basePath);
+
     this.middleware = this.#middleware.bind(this);
 
     App.#instances[this.#instance_id] = this;
@@ -43,50 +45,6 @@ class App {
     if (!App.#loader) {
       this.#loader = new Loader();
     }
-  }
-
-  /**
-   * Extracts path parameters from a URL based on a pattern.
-   * @private
-   * @template T - The path pattern type
-   * @param {T} pattern - The route pattern with parameter placeholders
-   * @param {string | URL} url - The URL to extract parameters from
-   * @returns {ExtractPathParams<T>} Object containing extracted path parameters
-   * @throws {Error} When URL is blank
-   */
-  #getPathParams<T extends string>(
-    pattern: T,
-    url: string | URL,
-  ): ExtractPathParams<T> {
-    let uri: URL;
-    let pathname: string;
-    try {
-      uri = url instanceof URL ? url : new URL(url);
-      pathname = uri.pathname;
-    } catch (_e) {
-      if (typeof url === "string" && url.trim() !== "") {
-        pathname = url;
-      } else {
-        throw new Error("Federation Error: URL is blank");
-      }
-    }
-
-    const patternSegments = pattern.split("/").filter(Boolean);
-    const pathSegments = pathname.split("/").filter(Boolean);
-
-    const params: Record<string, string> = {};
-
-    patternSegments.forEach((segment, index) => {
-      if (segment.startsWith(":")) {
-        const paramName = segment.slice(1);
-        const paramValue = pathSegments[index];
-        if (paramValue) {
-          params[paramName] = paramValue;
-        }
-      }
-    });
-
-    return params as ExtractPathParams<T>;
   }
 
   /**
@@ -156,7 +114,7 @@ class App {
         );
       });
     });
-    AppContext.params = this.#getPathParams(pathname, req.url ?? "");
+    AppContext.params = this.#handler.getPathParams(pathname, req.url ?? "");
 
     // If no response is provided, we need to create a new response type object with custom methods
     resp = resp ?? {
@@ -241,124 +199,24 @@ class App {
   ): Promise<void | Response> {
     let ctx: AppContext;
 
-    const matchedRoute = this.#matchRoute(reqOrCtx);
+    const matchedRoute = this.#handler.matchRoute(reqOrCtx);
 
     if (matchedRoute !== undefined) {
       ctx = this.#normalizeContext(matchedRoute, reqOrCtx, resOrNext, next);
 
-      const handler = this.#routes[matchedRoute][ctx.method];
-      if (handler) {
-        return handler(ctx);
+      // Get the route handler function for the matched route and method
+      const routeHandler = this.#handler.getRouteFn(matchedRoute);
+      if (routeHandler) {
+        const handler = routeHandler[ctx.method];
+        if (handler) {
+          return handler(ctx);
+        }
       }
 
       return await ctx.next();
     }
 
     return;
-  }
-
-  /**
-   * Matches a request against registered routes to find the appropriate handler.
-   * @private
-   * @param {Context | MinRequest} reqOrCtx - Request or context object
-   * @returns {string | undefined} Matched route path or undefined if no match
-   * @throws {Error} When URL is blank
-   */
-  #matchRoute(reqOrCtx: Context | MinRequest): string | undefined {
-    // Get URL from context or request
-    const url: string | URL | undefined =
-      ("req" in reqOrCtx ? reqOrCtx.req?.url : undefined) ??
-        ("request" in reqOrCtx ? reqOrCtx.request?.url : undefined) ??
-        ("url" in reqOrCtx ? reqOrCtx.url : undefined);
-    if (!url) return undefined;
-
-    let pathname: string;
-    try {
-      pathname = new URL(url).pathname;
-    } catch (_e) {
-      if (!url) {
-        throw new Error("Federation Error: URL is blank");
-      }
-      pathname = url.toString();
-    }
-
-    const method: string | undefined =
-      ("req" in reqOrCtx ? reqOrCtx.req?.method : undefined) ??
-        ("request" in reqOrCtx ? reqOrCtx.request?.method : undefined) ??
-        ("method" in reqOrCtx ? reqOrCtx.method : undefined);
-    if (!method) return undefined;
-
-    // Check if route exists with potential variables
-    for (const registeredPath of Object.keys(this.#routes)) {
-      const pathParts = pathname.split("/").filter(Boolean);
-      const routeParts = registeredPath.split("/").filter(Boolean);
-
-      if (pathParts.length === routeParts.length) {
-        let matches = true;
-        for (let i = 0; i < routeParts.length; i++) {
-          if (
-            !routeParts[i].startsWith(":") && routeParts[i] !== pathParts[i]
-          ) {
-            matches = false;
-            break;
-          }
-        }
-        if (matches && this.#routes[registeredPath][method as HTTPMethod]) {
-          return registeredPath;
-        }
-      }
-    }
-    return undefined;
-  }
-
-  /**
-   * Sets up routes by scanning the routes directory and importing handlers.
-   * @private
-   * @param {string} [basePath="/_federation"] - Base path for all routes
-   * @param {string} [dirPath="./routes"] - Directory containing route handlers
-   * @returns {Promise<void>}
-   */
-  async #setupRoutes(
-    basePath: string = "/_federation",
-    dirPath: string = "./routes",
-  ): Promise<void> {
-    this.#routes = {};
-    // Get all .ts files from the directory
-    const files = await walk(new URL(dirPath, import.meta.url), {
-      exts: [".ts"],
-      includeDirs: false,
-      includeSymlinks: false,
-      includeFiles: true,
-    });
-
-    for await (const file of files) {
-      // Generate the route path by combining basePath with filename (minus .ts)
-      const routePath = `${basePath}/${file.name.replace(".ts", "")}`;
-
-      // Import the module dynamically
-      const module = await import(`${dirPath}/${file.name}`);
-
-      this.#routes[routePath] = {};
-
-      // Check for HTTP method exports (get, post, etc.)
-      const methods: HTTPMethod[] = ["GET", "POST", "PUT", "DELETE"];
-      for (const method of methods) {
-        if (module[method]) {
-          this.#routes[routePath][method] = module[method];
-        }
-      }
-    }
-  }
-
-  /**
-   * Loads an island component by alias.
-   * @static
-   * @param {string} alias - The alias of the island to load
-   * @returns {string} The loaded island alias
-   */
-  public static loadIsland(alias: string) {
-    return alias;
-    // return App.#loader.loadIsland(alias);
   }
 
   /**
@@ -370,7 +228,4 @@ class App {
   }
 }
 
-const loadIsland = App.loadIsland;
-
-export { loadIsland };
-export default App;
+export { App };

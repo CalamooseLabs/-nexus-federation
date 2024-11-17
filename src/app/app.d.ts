@@ -2,14 +2,6 @@ type MiddlewareResponse = Promise<void | Response>;
 
 type MiddlewareNext = (error?: unknown) => MiddlewareResponse;
 
-type Routes = {
-  [path: string]: RouteHandler;
-};
-
-type RouteHandler = {
-  [key in HTTPMethod]?: (ctx: AppContext) => Response;
-};
-
 type TypedContext<T extends string> = Required<Context> & {
   params: ExtractPathParams<T>;
 };
@@ -77,19 +69,3 @@ interface AppContext {
   headers: Headers; // the headers of the response
   method: HTTPMethod; // the method of the request
 }
-
-interface Config {
-  remoteMap: {
-    [remoteBaseURL: string]: {
-      [alias: string]: string;
-    };
-  };
-  version: SemVer;
-  basePath: "/" | `/${string}`;
-}
-
-type ExtractPathParams<T extends string> = T extends
-  `${infer _Start}:${infer Param}/${infer Rest}`
-  ? { [k in Param | keyof ExtractPathParams<Rest>]: string }
-  : T extends `${infer _Start}:${infer Param}` ? { [k in Param]: string }
-  : Record<string | number | symbol, never>;
