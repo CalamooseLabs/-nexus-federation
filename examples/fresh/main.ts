@@ -1,5 +1,5 @@
 import { App, type FreshContext } from "jsr:@fresh/core@2.0.0-alpha.25";
-import HerdApp from "../../src/app/app.ts";
+import { App as HerdApp } from "#app";
 
 const app = new App();
 

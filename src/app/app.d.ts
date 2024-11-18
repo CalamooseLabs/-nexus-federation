@@ -2,7 +2,7 @@ type MiddlewareResponse = Promise<void | Response>;
 
 type MiddlewareNext = (error?: unknown) => MiddlewareResponse;
 
-type TypedContext<T extends string> = Required<Context> & {
+type TypedContext<T extends string> = Required<AppContext> & {
   params: ExtractPathParams<T>;
 };
 
@@ -35,7 +35,7 @@ interface MinResponse {
   end?: () => void;
   status?: number;
   send?: (body?: HTTPBody) => void;
-  setHeader?: (name: string, value: string) => void;
+  set?: (name: string, value: string) => void;
   headers?: Headers;
 }
 
@@ -66,6 +66,7 @@ interface AppContext {
   status: number; // the status of the response
   params: Record<string, string>; // the path parameters
   send: () => void | Response | Promise<Response>; // the send method that will return a response
+  set: (headerName: string, headerValue: string) => void; // the set method that will set a header
   headers: Headers; // the headers of the response
   method: HTTPMethod; // the method of the request
 }

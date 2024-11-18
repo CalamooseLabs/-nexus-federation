@@ -9,7 +9,10 @@ type RouteHandler = {
 };
 
 type ExtractPathParams<T extends string> = T extends
-  `${infer _Start}:${infer Param}/${infer Rest}`
-  ? { [k in Param | keyof ExtractPathParams<Rest>]: string }
-  : T extends `${infer _Start}:${infer Param}` ? { [k in Param]: string }
-  : Record<string | number | symbol, never>;
+  `${infer Start}/${infer Rest}`
+  ? Start extends `:${infer Param}`
+    ? { [k in Param]: string } & ExtractPathParams<Rest>
+    : ExtractPathParams<Rest>
+  : T extends `:${infer Param}`
+  ? { [k in Param]: string }
+  : Record<string, never>;

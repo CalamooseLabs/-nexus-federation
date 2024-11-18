@@ -1,3 +1,5 @@
+import { walk } from "@std/fs";
+
 class Handler {
   #basePath: string;
   #dirURL: URL;
@@ -20,16 +22,21 @@ class Handler {
   async #setupRoutes(): Promise<void> {
     this.#routes = {};
 
+    const entries = await walk(this.#dirURL, { includeDirs: false, includeFiles: true, exts: [".ts"] });
     // Get all .ts files from the directory
     try {
-      for await (const entry of Deno.readDir(this.#dirURL)) {
-        if (!entry.isFile || !entry.name.endsWith(".ts")) continue;
+      for await (const entry of entries) {
+        // Remove the base path from the entry path
+        const path = entry.path.replace(this.#dirPath, "");
 
         // Generate the route path by combining basePath with filename (minus .ts)
-        const routePath = `${this.#basePath}/${entry.name.replace(".ts", "")}`;
+        let routePath = `${this.#basePath}${path.replace(".ts", "")}`;
+        
+        // Change any variable path of [variableName] to :variableName
+        routePath = routePath.replace(/\[(\w+)\]/g, ":$1");
 
         // Import the module dynamically
-        const module = await import(`${this.#dirPath}/${entry.name}`);
+        const module = await import(entry.path);
 
         this.#routes[routePath] = {};
 
@@ -87,10 +94,7 @@ class Handler {
         let matches = true;
         for (let i = 0; i < routeParts.length; i++) {
           if (routeParts[i].startsWith(":")) {
-            // For variable parts, wrap the actual value in square brackets
-            if (pathParts[i] === `[${routeParts[i].slice(1)}]`) {
-              continue;
-            }
+            continue;
           } else if (routeParts[i] === pathParts[i]) {
             continue;
           }

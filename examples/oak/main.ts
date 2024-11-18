@@ -1,5 +1,5 @@
 import { Application } from "jsr:@oak/oak";
-import HerdApp from "../../src/app/app.ts";
+import { App as HerdApp } from "#app";
 
 const app = new Application();
 

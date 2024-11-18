@@ -1,5 +1,5 @@
 import { App as HerdApp } from "#app";
-import { assertEquals } from "jsr:@std/assert";
+import { assertEquals, assertObjectMatch } from "jsr:@std/assert";
 
 const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
 
@@ -28,17 +28,20 @@ Deno.test("Integration Tests:", async (task) => {
   const BASE_PORT = 8123;
   let currentPort = BASE_PORT;
 
-  const MANIFEST_CONTENT = "This is the manifest.json response";
+  const MANIFEST_CONTENT = {"version": "1.0.0"};
 
   const getManifest = async () => {
     try {
       const response = await fetch(
         `http://localhost:${currentPort}${FEDERATION_MANIFEST_PATH}`,
       );
-      const manifest = await response.text();
-
       assertEquals(response.status, 200);
-      assertEquals(manifest, MANIFEST_CONTENT);
+      // Get the content type from the headers but remove the charset
+      assertEquals(response.headers.get("Content-Type")?.split(";")[0], "application/json");
+
+      const manifest = await response.json();
+      
+      assertObjectMatch(manifest, MANIFEST_CONTENT);
     } finally {
       currentPort++;
     }

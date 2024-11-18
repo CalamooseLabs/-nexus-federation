@@ -121,7 +121,12 @@ class App {
       body: "",
     };
 
+    if (!resp.headers) {
+      resp.headers = new Headers();
+    }
+
     AppContext.resp = resp;
+
     Object.defineProperty(AppContext, "body", {
       get: () => ctx.body ?? resp.body,
       set: (value) => {
@@ -132,22 +137,40 @@ class App {
         }
       },
     });
+
     Object.defineProperty(AppContext, "status", {
       get: () => resp.status ?? 200,
       set: (value) => {
         resp.status = value;
       },
     });
+
     Object.defineProperty(AppContext, "headers", {
-      get: () => resp.headers,
+      get: () => {
+        return resp.headers ?? new Headers();
+      },
       set: (value) => {
         resp.headers = value;
       },
     });
+
+
+    AppContext.set = ((headerName:string, headerValue: string) => {
+      if (resp.set) {
+        resp.set(headerName, headerValue);
+      }
+      
+      if (AppContext.headers?.set) {
+        AppContext.headers.set(headerName, headerValue);
+      }
+    });
+    
     AppContext.send = () => {
+
       if (resp.send) resp.send(AppContext.body as string);
       return new Response(AppContext.body as string, {
         status: AppContext.status,
+        headers: AppContext.headers,
       });
     };
 

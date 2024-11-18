@@ -1,5 +1,5 @@
 import { Hono } from "jsr:@hono/hono";
-import HerdApp from "../../src/app/app.ts";
+import { App as HerdApp } from "#app";
 
 const app = new Hono();
 

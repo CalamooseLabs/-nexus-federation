@@ -1,6 +1,6 @@
 // @deno-types="npm:@types/koa@2.15.0"
 import Koa from "npm:koa@2.15.0";
-import HerdApp from "../../src/app/app.ts";
+import { App as HerdApp } from "#app";
 
 const app = new Koa();
 

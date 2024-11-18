@@ -1,6 +1,6 @@
 // @deno-types="npm:@types/express@5.0.0"
 import express, { type Request, type Response } from "npm:express@5.0.0";
-import HerdApp from "../../src/app/app.ts";
+import { App as HerdApp } from "#app";
 const app = express();
 
 app.get("/", (_req: Request, res: Response) => {
