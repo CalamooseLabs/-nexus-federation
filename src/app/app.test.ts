@@ -1,5 +1,10 @@
 import { App as HerdApp } from "#app";
-import { assertEquals, assertObjectMatch } from "jsr:@std/assert";
+import {
+  assert,
+  assertEquals,
+  assertNotEquals,
+  assertObjectMatch,
+} from "jsr:@std/assert";
 
 const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
 
@@ -18,6 +23,27 @@ Deno.test("Unit Tests:", async (subtest) => {
     });
 
     assertEquals(herd instanceof HerdApp, true);
+  });
+
+  await subtest.step("UUID per instance", () => {
+    const herd2 = new HerdApp();
+    assertNotEquals(herd.id, herd2.id);
+
+    //Check if herd.id is a valid UUID
+    assert(
+      herd.id.match(
+        /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      ),
+    );
+    assert(
+      herd2.id.match(
+        /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+      ),
+    );
+  });
+
+  await subtest.step("Empty Parameters Expects to Exit Early", () => {
+    herd.middleware({});
   });
 });
 
@@ -233,5 +259,63 @@ Deno.test("Integration Tests:", async (task) => {
         };
       });
     });
+
+    await denoServeTask.step("Only Request (as fetch)", async () => {
+      const app = new HerdApp();
+      await withHTTP(() => {
+        const controller = new AbortController();
+        Deno.serve({
+          port: currentPort,
+          signal: controller.signal,
+          onListen: () => {},
+        }, app.fetch);
+        return {
+          close: () => controller.abort(),
+        };
+      });
+    });
+
+    await denoServeTask.step(
+      "Request and Serve Handler Info (as fetch)",
+      async () => {
+        const app = new HerdApp();
+        await withHTTP(() => {
+          const controller = new AbortController();
+          Deno.serve({
+            port: currentPort,
+            signal: controller.signal,
+            onListen: () => {},
+          }, (req, info) => app.fetch(req, info));
+          return {
+            close: () => controller.abort(),
+          };
+        });
+      },
+    );
+
+    await denoServeTask.step(
+      "Request and Serve Handler Info (as fetch) - Empty Request",
+      async () => {
+        const app = new HerdApp();
+        const controller = new AbortController();
+        try {
+          Deno.serve({
+            port: currentPort,
+            signal: controller.signal,
+            onListen: () => {},
+          }, (_req, info) => app.fetch({} as Request, info));
+
+          const response = await fetch(
+            `http://localhost:${currentPort}${FEDERATION_MANIFEST_PATH}`,
+          );
+          assertEquals(response.status, 200);
+
+          const emptyResponse = await response.text();
+          assertEquals(emptyResponse, "");
+        } finally {
+          controller.abort();
+        }
+      },
+    );
   });
 });

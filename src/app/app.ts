@@ -124,12 +124,8 @@ class App {
       }
     }
 
-    if (!req) {
-      throw new Error("Request is required in context");
-    }
-
-    AppContext.req = req;
-    AppContext.method = req.method as HTTPMethod;
+    AppContext.req = req as MinRequest;
+    AppContext.method = req?.method as HTTPMethod;
     AppContext.next = nextFn ?? (() => {
       return new Promise((resolve) => {
         resolve(
@@ -139,7 +135,7 @@ class App {
         );
       });
     });
-    AppContext.params = this.#handler.getPathParams(pathname, req.url ?? "");
+    AppContext.params = this.#handler.getPathParams(pathname, req?.url ?? "");
 
     // If no response is provided, we need to create a new response type object with custom methods
     resp = resp ?? {
@@ -291,7 +287,7 @@ class App {
   }
 
   /**
-   * Fetch handler for use with Deno.serve
+   * Fetch handler for use with default export for deno serve
    * @param {Request} request - The incoming request
    * @param {ServeHandlerInfo} handlerInfo - The serve handler info
    * @returns {Promise<Response>} The response
@@ -301,15 +297,13 @@ class App {
     handlerInfo: ServeHandlerInfo,
   ) => Promise<Response> = (request, handlerInfo) => {
     const response = this.#middleware(request, handlerInfo);
-    if (response instanceof Promise) {
-      return response.then((res) => {
-        if (res === undefined) {
-          return new Response();
-        }
-        return res;
-      });
-    }
-    return response;
+
+    return response.then((res) => {
+      if (res === undefined) {
+        return new Response();
+      }
+      return res;
+    });
   };
 }
 
