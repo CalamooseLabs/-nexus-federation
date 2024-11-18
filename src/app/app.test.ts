@@ -5,7 +5,7 @@ const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
 
 Deno.test("Unit Tests:", async (subtest) => {
   const herd = new HerdApp();
-  
+
   await subtest.step("Constructor - No Arguments", () => {
     assertEquals(herd instanceof HerdApp, true);
   });
@@ -28,7 +28,7 @@ Deno.test("Integration Tests:", async (task) => {
   const BASE_PORT = 8123;
   let currentPort = BASE_PORT;
 
-  const MANIFEST_CONTENT = {"version": "1.0.0"};
+  const MANIFEST_CONTENT = { "version": "1.0.0" };
 
   const getManifest = async () => {
     try {
@@ -37,10 +37,13 @@ Deno.test("Integration Tests:", async (task) => {
       );
       assertEquals(response.status, 200);
       // Get the content type from the headers but remove the charset
-      assertEquals(response.headers.get("Content-Type")?.split(";")[0], "application/json");
+      assertEquals(
+        response.headers.get("Content-Type")?.split(";")[0],
+        "application/json",
+      );
 
       const manifest = await response.json();
-      
+
       assertObjectMatch(manifest, MANIFEST_CONTENT);
     } finally {
       currentPort++;
@@ -195,6 +198,38 @@ Deno.test("Integration Tests:", async (task) => {
         const server = app.listen(currentPort);
         return {
           close: () => server.close(),
+        };
+      });
+    });
+  });
+
+  await task.step("Deno.Serve Integration:", async (denoServeTask) => {
+    await denoServeTask.step("Only Request", async () => {
+      const app = new HerdApp();
+      await withHTTP(() => {
+        const controller = new AbortController();
+        Deno.serve({
+          port: currentPort,
+          signal: controller.signal,
+          onListen: () => {},
+        }, (req) => app.middleware(req));
+        return {
+          close: () => controller.abort(),
+        };
+      });
+    });
+
+    await denoServeTask.step("Request and Serve Handler Info", async () => {
+      const app = new HerdApp();
+      await withHTTP(() => {
+        const controller = new AbortController();
+        Deno.serve({
+          port: currentPort,
+          signal: controller.signal,
+          onListen: () => {},
+        }, app.middleware);
+        return {
+          close: () => controller.abort(),
         };
       });
     });

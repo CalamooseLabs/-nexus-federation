@@ -22,7 +22,11 @@ class Handler {
   async #setupRoutes(): Promise<void> {
     this.#routes = {};
 
-    const entries = await walk(this.#dirURL, { includeDirs: false, includeFiles: true, exts: [".ts"] });
+    const entries = await walk(this.#dirURL, {
+      includeDirs: false,
+      includeFiles: true,
+      exts: [".ts"],
+    });
     // Get all .ts files from the directory
     try {
       for await (const entry of entries) {
@@ -31,7 +35,7 @@ class Handler {
 
         // Generate the route path by combining basePath with filename (minus .ts)
         let routePath = `${this.#basePath}${path.replace(".ts", "")}`;
-        
+
         // Change any variable path of [variableName] to :variableName
         routePath = routePath.replace(/\[(\w+)\]/g, ":$1");
 

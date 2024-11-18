@@ -70,3 +70,7 @@ interface AppContext {
   headers: Headers; // the headers of the response
   method: HTTPMethod; // the method of the request
 }
+
+type ServeHandlerInfo = {
+  remoteAddr?: Deno.Addr;
+};

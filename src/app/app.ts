@@ -29,7 +29,10 @@ class App {
 
     this.#builder = new Builder();
     this.#config = new Config(config);
-    this.#handler = new Handler(new URL("./routes", import.meta.url), this.#config.basePath);
+    this.#handler = new Handler(
+      new URL("./routes", import.meta.url),
+      this.#config.basePath,
+    );
 
     this.middleware = this.#middleware.bind(this);
 
@@ -60,7 +63,7 @@ class App {
   #normalizeContext(
     pathname: string,
     reqOrCtx: Context | MinRequest,
-    resOrNext?: MinResponse | MiddlewareNext,
+    resOrNextOrHandlerInfo?: MinResponse | MiddlewareNext | ServeHandlerInfo,
     next?: MiddlewareNext,
   ): AppContext {
     const AppContext: AppContext = {} as AppContext;
@@ -72,31 +75,53 @@ class App {
 
     if (next) {
       // Then all params are provided meaning resOrNext is a response and reqOrCtx is a request
+      // Three param overload
       const n: MiddlewareNext = next as MiddlewareNext;
-      const r: MinResponse = resOrNext as MinResponse;
+      const r: MinResponse = resOrNextOrHandlerInfo as MinResponse;
       const rq: MinRequest = reqOrCtx as MinRequest;
 
       nextFn = n;
       resp = r;
       req = rq;
       ctx = {};
-    } else if (resOrNext) {
+    } else if (resOrNextOrHandlerInfo) {
       // Then next is provided meaning reqOrCtx is a context and resOrNext is a next function
-      const c: Context = reqOrCtx as Context;
-      const n: MiddlewareNext = resOrNext as MiddlewareNext;
+      // Two param overload
+      if (resOrNextOrHandlerInfo instanceof Function) {
+        // Then it is a context and next is provided
+        const c: Context = reqOrCtx as Context;
+        const n: MiddlewareNext = resOrNextOrHandlerInfo as MiddlewareNext;
 
-      nextFn = n;
-      resp = c.response ?? c.resp;
-      req = c.req ?? c.request;
-      ctx = c;
+        nextFn = n;
+        resp = c.response ?? c.resp;
+        req = c.req ?? c.request;
+        ctx = c;
+      } else {
+        // Then it is a request and serve handler info is provided
+        const rq: MinRequest = reqOrCtx as MinRequest;
+        const _h: ServeHandlerInfo = resOrNextOrHandlerInfo as ServeHandlerInfo;
+
+        nextFn = undefined;
+        req = rq;
+        ctx = {} as Context;
+      }
     } else {
       // Then only reqOrCtx is provided meaning it is a context
-      const c: Context = reqOrCtx as Context;
+      // Single param overload
 
-      req = c.req ?? c.request;
-      resp = c.resp ?? c.response;
-      nextFn = c.next;
-      ctx = c;
+      //Decide if reqOrCtx is a context or a request
+      if ("req" in reqOrCtx || "request" in reqOrCtx) {
+        // Then it is a context
+        const c: Context = reqOrCtx as Context;
+        req = c.req ?? c.request;
+        resp = c.resp ?? c.response;
+        nextFn = c.next;
+        ctx = c;
+      } else {
+        // Then it is a request
+        req = reqOrCtx as MinRequest;
+        ctx = {} as Context;
+      }
     }
 
     if (!req) {
@@ -154,19 +179,17 @@ class App {
       },
     });
 
-
-    AppContext.set = ((headerName:string, headerValue: string) => {
+    AppContext.set = (headerName: string, headerValue: string) => {
       if (resp.set) {
         resp.set(headerName, headerValue);
       }
-      
+
       if (AppContext.headers?.set) {
         AppContext.headers.set(headerName, headerValue);
       }
-    });
-    
-    AppContext.send = () => {
+    };
 
+    AppContext.send = () => {
       if (resp.send) resp.send(AppContext.body as string);
       return new Response(AppContext.body as string, {
         status: AppContext.status,
@@ -186,6 +209,14 @@ class App {
    */
   async #middleware(ctx: Context): Promise<Response>;
   /**
+   * Universal middleware handler that processes incoming requests and routes them to appropriate federation handlers.
+   * @private
+   * @overload
+   * @param {MinRequest} req - Request object
+   * @returns {Promise<Response>} Response object
+   */
+  async #middleware(req: MinRequest): Promise<Response>;
+  /**
    * @private
    * @overload
    * @param {Context} ctx - Context object containing request and response
@@ -196,10 +227,14 @@ class App {
   /**
    * @private
    * @overload
-   * @param {Context} ctx - Context object containing request and response
-   * @param {MiddlewareNext} next - Next middleware function
+   * @param {MinRequest} req - Request object
+   * @param {ServeHandlerInfo} handlerInfo - Handler info object
    * @returns {MiddlewareResponse} Promise resolving to void or Response
    */
+  async #middleware(
+    req: MinRequest,
+    handlerInfo: ServeHandlerInfo,
+  ): MiddlewareResponse;
   /**
    * @private
    * @overload
@@ -217,7 +252,7 @@ class App {
   // The actual definition of the middleware function that needs to filter out the request/response/next params depending on the overload
   async #middleware(
     reqOrCtx: Context | MinRequest,
-    resOrNext?: MinResponse | MiddlewareNext,
+    resOrNextOrHandlerInfo?: MinResponse | MiddlewareNext | ServeHandlerInfo,
     next?: MiddlewareNext,
   ): Promise<void | Response> {
     let ctx: AppContext;
@@ -225,7 +260,12 @@ class App {
     const matchedRoute = this.#handler.matchRoute(reqOrCtx);
 
     if (matchedRoute !== undefined) {
-      ctx = this.#normalizeContext(matchedRoute, reqOrCtx, resOrNext, next);
+      ctx = this.#normalizeContext(
+        matchedRoute,
+        reqOrCtx,
+        resOrNextOrHandlerInfo,
+        next,
+      );
 
       // Get the route handler function for the matched route and method
       const routeHandler = this.#handler.getRouteFn(matchedRoute);
@@ -249,6 +289,28 @@ class App {
   get id(): UUID {
     return this.#instance_id;
   }
+
+  /**
+   * Fetch handler for use with Deno.serve
+   * @param {Request} request - The incoming request
+   * @param {ServeHandlerInfo} handlerInfo - The serve handler info
+   * @returns {Promise<Response>} The response
+   */
+  public fetch: (
+    request: Request,
+    handlerInfo: ServeHandlerInfo,
+  ) => Promise<Response> = (request, handlerInfo) => {
+    const response = this.#middleware(request, handlerInfo);
+    if (response instanceof Promise) {
+      return response.then((res) => {
+        if (res === undefined) {
+          return new Response();
+        }
+        return res;
+      });
+    }
+    return response;
+  };
 }
 
 export { App };

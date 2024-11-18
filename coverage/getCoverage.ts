@@ -19,10 +19,10 @@ async function runTests(type: string, coverageDir: string) {
     args: [
       "task",
       testSuite,
-      "--coverage=" + coverageDir
+      "--coverage=" + coverageDir,
     ],
   });
-  
+
   const { success } = await cmd.output();
   if (!success) {
     throw new Error(`${type} tests failed`);
@@ -30,7 +30,9 @@ async function runTests(type: string, coverageDir: string) {
 }
 
 export async function getFolder(args: string[]): Promise<void> {
-  const config = (await parse(await Deno.readTextFile("deno.jsonc")) as { version?: string });
+  const config = await parse(await Deno.readTextFile("deno.jsonc")) as {
+    version?: string;
+  };
   if (!config) throw new Error("Failed to parse deno.jsonc");
   const version = config?.version ?? "unknown";
   const now = new Date();
@@ -46,7 +48,10 @@ export async function getFolder(args: string[]): Promise<void> {
     return;
   }
   if (args.includes("--integration")) {
-    await runTests("integration", `coverage/integration-tests/${version}/${timestamp}`);
+    await runTests(
+      "integration",
+      `coverage/integration-tests/${version}/${timestamp}`,
+    );
     return;
   }
   if (args.includes("--all")) {
