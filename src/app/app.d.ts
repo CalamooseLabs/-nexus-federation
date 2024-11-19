@@ -22,9 +22,9 @@ type HTTPBody =
   | null;
 
 type MinRequest = {
-  url?: string | URL;
+  url: string | URL;
   headers?: Headers;
-  method?: string;
+  method: string;
   body?: HTTPBody;
 };
 

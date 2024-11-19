@@ -69,7 +69,7 @@ class App {
     const AppContext: AppContext = {} as AppContext;
 
     let ctx: Context;
-    let req: MinRequest | undefined;
+    let req: MinRequest;
     let resp: MinResponse | undefined;
     let nextFn: MiddlewareNext | undefined;
 
@@ -94,7 +94,7 @@ class App {
 
         nextFn = n;
         resp = c.response ?? c.resp;
-        req = c.req ?? c.request;
+        req = (c.req ?? c.request) as MinRequest;
         ctx = c;
       } else {
         // Then it is a request and serve handler info is provided
@@ -113,7 +113,7 @@ class App {
       if ("req" in reqOrCtx || "request" in reqOrCtx) {
         // Then it is a context
         const c: Context = reqOrCtx as Context;
-        req = c.req ?? c.request;
+        req = (c.req ?? c.request) as MinRequest;
         resp = c.resp ?? c.response;
         nextFn = c.next;
         ctx = c;
@@ -125,17 +125,9 @@ class App {
     }
 
     AppContext.req = req as MinRequest;
-    AppContext.method = req?.method as HTTPMethod;
-    AppContext.next = nextFn ?? (() => {
-      return new Promise((resolve) => {
-        resolve(
-          new Response(
-            "Federation Error: Next function is required in middleware",
-          ),
-        );
-      });
-    });
-    AppContext.params = this.#handler.getPathParams(pathname, req?.url ?? "");
+    AppContext.method = req.method as HTTPMethod;
+    AppContext.next = nextFn as MiddlewareNext;
+    AppContext.params = this.#handler.getPathParams(pathname, req.url);
 
     // If no response is provided, we need to create a new response type object with custom methods
     resp = resp ?? {
@@ -160,7 +152,6 @@ class App {
     });
 
     Object.defineProperty(AppContext, "status", {
-      get: () => resp.status ?? 200,
       set: (value) => {
         resp.status = value;
       },
@@ -168,11 +159,8 @@ class App {
 
     Object.defineProperty(AppContext, "headers", {
       get: () => {
-        return resp.headers ?? new Headers();
-      },
-      set: (value) => {
-        resp.headers = value;
-      },
+        return resp.headers;
+      }
     });
 
     AppContext.set = (headerName: string, headerValue: string) => {
@@ -268,11 +256,9 @@ class App {
       if (routeHandler) {
         const handler = routeHandler[ctx.method];
         if (handler) {
-          return handler(ctx);
+          return await handler(ctx);
         }
       }
-
-      return await ctx.next();
     }
 
     return;

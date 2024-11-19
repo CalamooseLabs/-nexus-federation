@@ -2,7 +2,7 @@ type Routes = {
   [path: string]: RouteHandler;
 };
 
-type RouteHandlerFn = (ctx: AppContext) => Response;
+type RouteHandlerFn = (ctx: AppContext) => Response | Promise<Response>;
 
 type RouteHandler = {
   [key in HTTPMethod]?: RouteHandlerFn;

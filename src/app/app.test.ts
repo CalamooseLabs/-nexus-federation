@@ -294,6 +294,43 @@ Deno.test("Integration Tests:", async (task) => {
     );
 
     await denoServeTask.step(
+      "Req inside context",
+      async () => {
+        const app = new HerdApp();
+        await withHTTP(() => {
+          const controller = new AbortController();
+          Deno.serve({
+            port: currentPort,
+            signal: controller.signal,
+            onListen: () => {},
+          }, (req, _info) => app.middleware({req}));
+          return {
+            close: () => controller.abort(),
+          };
+        });
+      },
+    );
+
+    await denoServeTask.step(
+      "Request inside context",
+      async () => {
+        const app = new HerdApp();
+        await withHTTP(() => {
+          const controller = new AbortController();
+          Deno.serve({
+            port: currentPort,
+            signal: controller.signal,
+            onListen: () => {},
+          }, (request, _info) => app.middleware({request}));
+          return {
+            close: () => controller.abort(),
+          };
+        });
+      },
+    );
+
+    // Have this at the end because it's the slowest and the port hangs if it's not the last test
+    await denoServeTask.step(
       "Request and Serve Handler Info (as fetch) - Empty Request",
       async () => {
         const app = new HerdApp();
