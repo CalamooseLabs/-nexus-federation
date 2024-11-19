@@ -23,6 +23,10 @@ class Loader {
     });
   }
 
+  static IS_BROWSER(): boolean {
+    return typeof window !== "undefined";
+  }
+
   // public async loadIsland(alias: string): Promise<() => unknown> {
   //   const ServerIsland = await import(alias);
 

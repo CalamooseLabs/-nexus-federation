@@ -1,6 +1,6 @@
 <div style="text-align: center;">
   <h1>Herd JS</h1>
-  <img height="250px" src="./static/logo-nobg.png" alt="Amber.js Logo" />
+  <img height="250px" src="./static/logo.png" alt="Herd JS Logo" />
 </div>
 
 **Amber.js** is a module federation plugin for Fresh and Deno, inspired by the
