@@ -1,3 +1,5 @@
+// @ts-self-types="./config.d.ts"
+
 import { parse } from "@std/jsonc";
 
 import { defaultConfig } from "./config.default.ts";
