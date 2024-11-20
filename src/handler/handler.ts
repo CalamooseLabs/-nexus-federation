@@ -1,3 +1,5 @@
+// @ts-self-types="./handler.d.ts"
+
 import { walk } from "@std/fs";
 
 class Handler {

@@ -1,3 +1,5 @@
+// @ts-self-types="./app.d.ts"
+
 import { Loader } from "#loader";
 import { Handler } from "#handler";
 import { Config } from "#config";

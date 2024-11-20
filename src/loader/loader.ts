@@ -1,3 +1,5 @@
+// @ts-self-types="./loader.d.ts"
+
 interface AliasMapKey {
   "baseUrl": string | URL;
   "componentPath": string;

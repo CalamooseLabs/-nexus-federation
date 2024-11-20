@@ -1,3 +1,5 @@
+// @ts-self-types="./router.d.ts"
+
 class Router implements Router {
   #getRoutes: Map<string, (ctx: Context) => Promise<Response> | Response> =
     new Map();
