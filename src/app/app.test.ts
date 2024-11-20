@@ -1,4 +1,4 @@
-import { App as HerdApp } from "#app";
+import { App as InternalApp } from "#app";
 import {
   assert,
   assertEquals,
@@ -9,24 +9,24 @@ import {
 const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
 
 Deno.test("Unit Tests:", async (subtest) => {
-  const herd = new HerdApp();
+  const herd = new InternalApp();
 
   await subtest.step("Constructor - No Arguments", () => {
-    assertEquals(herd instanceof HerdApp, true);
+    assertEquals(herd instanceof InternalApp, true);
   });
 
   await subtest.step("Constructor - With Arguments", () => {
-    const herd = new HerdApp({
+    const testApp = new InternalApp({
       basePath: "/_doesntmatter",
       version: "1.0.0",
       remoteMap: {},
     });
 
-    assertEquals(herd instanceof HerdApp, true);
+    assertEquals(testApp instanceof InternalApp, true);
   });
 
   await subtest.step("UUID per instance", () => {
-    const herd2 = new HerdApp();
+    const herd2 = new InternalApp();
     assertNotEquals(herd.id, herd2.id);
 
     //Check if herd.id is a valid UUID
@@ -48,8 +48,8 @@ Deno.test("Unit Tests:", async (subtest) => {
 });
 
 Deno.test("Integration Tests:", async (task) => {
-  const herd = new HerdApp();
-  const middleware = herd.middleware;
+  const testApp = new InternalApp();
+  const middleware = testApp.middleware;
 
   const BASE_PORT = 8123;
   let currentPort = BASE_PORT;
@@ -231,14 +231,13 @@ Deno.test("Integration Tests:", async (task) => {
 
   await task.step("Deno.Serve Integration:", async (denoServeTask) => {
     await denoServeTask.step("Only Request", async () => {
-      const app = new HerdApp();
       await withHTTP(() => {
         const controller = new AbortController();
         Deno.serve({
           port: currentPort,
           signal: controller.signal,
           onListen: () => {},
-        }, (req) => app.middleware(req));
+        }, (req) => middleware(req));
         return {
           close: () => controller.abort(),
         };
@@ -246,14 +245,13 @@ Deno.test("Integration Tests:", async (task) => {
     });
 
     await denoServeTask.step("Request and Serve Handler Info", async () => {
-      const app = new HerdApp();
       await withHTTP(() => {
         const controller = new AbortController();
         Deno.serve({
           port: currentPort,
           signal: controller.signal,
           onListen: () => {},
-        }, app.middleware);
+        }, middleware);
         return {
           close: () => controller.abort(),
         };
@@ -261,14 +259,13 @@ Deno.test("Integration Tests:", async (task) => {
     });
 
     await denoServeTask.step("Only Request (as fetch)", async () => {
-      const app = new HerdApp();
       await withHTTP(() => {
         const controller = new AbortController();
         Deno.serve({
           port: currentPort,
           signal: controller.signal,
           onListen: () => {},
-        }, app.fetch);
+        }, testApp.fetch);
         return {
           close: () => controller.abort(),
         };
@@ -278,14 +275,13 @@ Deno.test("Integration Tests:", async (task) => {
     await denoServeTask.step(
       "Request and Serve Handler Info (as fetch)",
       async () => {
-        const app = new HerdApp();
         await withHTTP(() => {
           const controller = new AbortController();
           Deno.serve({
             port: currentPort,
             signal: controller.signal,
             onListen: () => {},
-          }, (req, info) => app.fetch(req, info));
+          }, (req, info) => testApp.fetch(req, info));
           return {
             close: () => controller.abort(),
           };
@@ -296,14 +292,13 @@ Deno.test("Integration Tests:", async (task) => {
     await denoServeTask.step(
       "Req inside context",
       async () => {
-        const app = new HerdApp();
         await withHTTP(() => {
           const controller = new AbortController();
           Deno.serve({
             port: currentPort,
             signal: controller.signal,
             onListen: () => {},
-          }, (req, _info) => app.middleware({req}));
+          }, (req, _info) => middleware({req}));
           return {
             close: () => controller.abort(),
           };
@@ -314,14 +309,13 @@ Deno.test("Integration Tests:", async (task) => {
     await denoServeTask.step(
       "Request inside context",
       async () => {
-        const app = new HerdApp();
         await withHTTP(() => {
           const controller = new AbortController();
           Deno.serve({
             port: currentPort,
             signal: controller.signal,
             onListen: () => {},
-          }, (request, _info) => app.middleware({request}));
+          }, (request, _info) => middleware({request}));
           return {
             close: () => controller.abort(),
           };
@@ -333,14 +327,13 @@ Deno.test("Integration Tests:", async (task) => {
     await denoServeTask.step(
       "Request and Serve Handler Info (as fetch) - Empty Request",
       async () => {
-        const app = new HerdApp();
         const controller = new AbortController();
         try {
           Deno.serve({
             port: currentPort,
             signal: controller.signal,
             onListen: () => {},
-          }, (_req, info) => app.fetch({} as Request, info));
+          }, (_req, info) => testApp.fetch({} as Request, info));
 
           const response = await fetch(
             `http://localhost:${currentPort}${FEDERATION_MANIFEST_PATH}`,
@@ -351,6 +344,7 @@ Deno.test("Integration Tests:", async (task) => {
           assertEquals(emptyResponse, "");
         } finally {
           controller.abort();
+          currentPort++;
         }
       },
     );
