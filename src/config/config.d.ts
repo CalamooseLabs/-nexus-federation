@@ -1,4 +1,4 @@
-interface HerdConfig {
+interface AppConfig {
   remoteMap: {
     [remoteBaseURL: string]: {
       [alias: string]: string;
@@ -15,17 +15,16 @@ interface HerdConfig {
   importMap?: Record<string, string>;
   compilerOptions?: Record<string, string>;
   configLocation?: string;
-  herd?: {
-    leader?: string;
+  federation?: {
+    nexus?: string | string[];
     autoDiscovery?: boolean;
     apiKey?: string;
     name?: string;
-    coLeaders?: string[];
   };
   plugins?: PluginFn[];
 }
 
-type DefaultHerdConfig = NonOptional<HerdConfig>;
+type DefaultAppConfig = NonOptional<AppConfig>;
 
 type JsonType =
   | { [key: string]: JsonType | undefined }

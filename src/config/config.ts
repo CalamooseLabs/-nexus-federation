@@ -3,22 +3,22 @@ import { parse } from "@std/jsonc";
 import { defaultConfig } from "./config.default.ts";
 
 class Config {
-  version: DefaultHerdConfig["version"];
-  remoteMap: DefaultHerdConfig["remoteMap"];
-  basePath: DefaultHerdConfig["basePath"];
-  skipConsumer: DefaultHerdConfig["skipConsumer"];
-  skipProvider: DefaultHerdConfig["skipProvider"];
-  cacheTime: DefaultHerdConfig["cacheTime"];
-  hostname: DefaultHerdConfig["hostname"];
-  port: DefaultHerdConfig["port"];
-  imports: DefaultHerdConfig["imports"];
-  importMap: DefaultHerdConfig["importMap"];
-  compilerOptions: DefaultHerdConfig["compilerOptions"];
-  configLocation: DefaultHerdConfig["configLocation"];
-  herd: DefaultHerdConfig["herd"];
-  plugins: DefaultHerdConfig["plugins"];
+  version: DefaultAppConfig["version"];
+  remoteMap: DefaultAppConfig["remoteMap"];
+  basePath: DefaultAppConfig["basePath"];
+  skipConsumer: DefaultAppConfig["skipConsumer"];
+  skipProvider: DefaultAppConfig["skipProvider"];
+  cacheTime: DefaultAppConfig["cacheTime"];
+  hostname: DefaultAppConfig["hostname"];
+  port: DefaultAppConfig["port"];
+  imports: DefaultAppConfig["imports"];
+  importMap: DefaultAppConfig["importMap"];
+  compilerOptions: DefaultAppConfig["compilerOptions"];
+  configLocation: DefaultAppConfig["configLocation"];
+  federation: DefaultAppConfig["federation"];
+  plugins: DefaultAppConfig["plugins"];
 
-  constructor(config?: HerdConfig) {
+  constructor(config?: AppConfig) {
     this.configLocation = config?.configLocation ??
       defaultConfig.configLocation;
 
@@ -50,8 +50,8 @@ class Config {
     this.importMap = config?.importMap ?? defaultConfig.importMap;
     this.compilerOptions = config?.compilerOptions ??
       defaultConfig.compilerOptions;
-    defaultConfig.configLocation;
-    this.herd = config?.herd ?? defaultConfig.herd;
+    this.configLocation = config?.configLocation ?? defaultConfig.configLocation;
+    this.federation = config?.federation ?? defaultConfig.federation;
     this.plugins = config?.plugins ?? defaultConfig.plugins;
   }
 }

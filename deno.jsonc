@@ -1,5 +1,5 @@
 {
-  "name": "@herd/herd",
+  "name": "@calamooselabs/internal",
   "description": "A lightweight JSX router and SSR/CSR renderer for Deno, inspired by module federation. It enables easy micro frontend setups, offering an intuitive API for modular architectures without complex configurations, perfect for streamlined Deno projects.",
   "version": "0.0.1-alpha",
   "license": "MIT",

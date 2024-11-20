@@ -1,13 +1,13 @@
 import { App, type FreshContext } from "jsr:@fresh/core@2.0.0-alpha.25";
-import { App as HerdApp } from "#app";
+import { App as InternalApp } from "#app";
 
 const app = new App();
 
 app.get("/", (_ctx: FreshContext) => new Response("Welcome to the Fresh API!"));
 
-const herd = new HerdApp();
+const internalApp = new InternalApp();
 
-const middleware = herd.middleware;
+const middleware = internalApp.middleware;
 
 // app.use((_ctx) => {
 //   console.log("middleware");

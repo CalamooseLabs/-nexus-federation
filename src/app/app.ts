@@ -22,9 +22,9 @@ class App {
 
   /**
    * Creates a new App instance with optional configuration.
-   * @param {HerdConfig} [config] - Optional configuration object
+   * @param {AppConfig} [config] - Optional configuration object
    */
-  constructor(config?: HerdConfig) {
+  constructor(config?: AppConfig) {
     this.#instance_id = crypto.randomUUID();
 
     this.#builder = new Builder();

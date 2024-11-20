@@ -1,15 +1,15 @@
 // @deno-types="npm:@types/express@5.0.0"
 import express, { type Request, type Response } from "npm:express@5.0.0";
-import { App as HerdApp } from "#app";
+import { App as InternalApp } from "#app";
 const app = express();
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Welcome to the Express.js API!");
 });
 
-const herd = new HerdApp();
+const internalApp = new InternalApp();
 
-const middleware = herd.middleware;
+const middleware = internalApp.middleware;
 
 // app.use((_req, res, _next) => {
 //   res.send("Hello World");

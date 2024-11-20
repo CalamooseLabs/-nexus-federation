@@ -9,10 +9,10 @@ import {
 const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
 
 Deno.test("Unit Tests:", async (subtest) => {
-  const herd = new InternalApp();
+  const testApp = new InternalApp();
 
   await subtest.step("Constructor - No Arguments", () => {
-    assertEquals(herd instanceof InternalApp, true);
+    assertEquals(testApp instanceof InternalApp, true);
   });
 
   await subtest.step("Constructor - With Arguments", () => {
@@ -26,24 +26,24 @@ Deno.test("Unit Tests:", async (subtest) => {
   });
 
   await subtest.step("UUID per instance", () => {
-    const herd2 = new InternalApp();
-    assertNotEquals(herd.id, herd2.id);
+    const testApp2 = new InternalApp();
+    assertNotEquals(testApp.id, testApp2.id);
 
-    //Check if herd.id is a valid UUID
+    //Check if Class Instance ID is a valid UUID
     assert(
-      herd.id.match(
+      testApp.id.match(
         /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       ),
     );
     assert(
-      herd2.id.match(
+      testApp2.id.match(
         /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
       ),
     );
   });
 
   await subtest.step("Empty Parameters Expects to Exit Early", () => {
-    herd.middleware({});
+    testApp.middleware({});
   });
 });
 

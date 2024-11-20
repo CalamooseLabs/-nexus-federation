@@ -1,4 +1,4 @@
-const defaultConfig: DefaultHerdConfig = {
+const defaultConfig: DefaultAppConfig = {
   version: "1.0.0",
   remoteMap: {},
   basePath: "/_federation",
@@ -11,12 +11,11 @@ const defaultConfig: DefaultHerdConfig = {
   importMap: {},
   compilerOptions: {},
   configLocation: "./deno.jsonc",
-  herd: {
-    leader: "",
+  federation: {
+    nexus: "",
     autoDiscovery: true,
     apiKey: "",
-    name: "",
-    coLeaders: [],
+    name: ""
   },
   plugins: [],
 };

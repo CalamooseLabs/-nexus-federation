@@ -1,19 +1,18 @@
 <div style="text-align: center;">
-  <h1>Herd JS</h1>
-  <img height="250px" src="./static/logo.png" alt="Herd JS Logo" />
+  <h1>Calamoose Labs Presents</h1>
+  <img height="250px" src="./static/logo.png" alt="Logo" />
 </div>
 
-**Amber.js** is a module federation plugin for Fresh and Deno, inspired by the
-concept of Jurassic Park amber. This plugin allows seamless sharing of
-components between independent Fresh applications by setting up a federated
-component ecosystem. The producer app exposes specified components, and the
-consumer app dynamically imports these components via friendly aliases.
+**Internal App** is a module federation plugin for Deno, inspired by the
+concept of module federation, micro frontends, and microservices. This middleware allows seamless sharing of
+components between independent applications by setting up a federated gateway. As well as providing a 
+federated gateway for backend services.
 
 ---
 
 ## Features
 
-- **Easy Federation**: Share components across Fresh apps with minimal setup.
+- **Easy Federation**: Share components across apps with minimal setup.
 - **Dynamic Imports**: Components are loaded on-demand in the consumer app,
   reducing bundle size.
 - **Alias Mapping**: Use simple aliases to reference remote components,
@@ -23,103 +22,41 @@ consumer app dynamically imports these components via friendly aliases.
 
 ## Getting Started
 
-### Producer App Setup
+### Producer/Gateway Setup
 
-In the producer Fresh app, install **Amber.js** and configure it to expose the
-components you want to share.
+To create a producer app or gateway, you need to set up the configuration for the remote components.
 
-1. **Install the Plugin**
+1. **Step One**
    ```typescript
-   import { start } from "$fresh/server.ts";
-   import { createFederationPlugin } from "./federation_plugin.ts"; // Path to Amber.js plugin
-
-   await start({
-     plugins: [createFederationPlugin(["header", "footer", "sidebar"])],
-   });
+   console.log("Step One");
    ```
 
-2. **Serve Components**
-
-   This configuration will expose components at:
-   - `https://producer-server.com/federation/header`
-   - `https://producer-server.com/federation/footer`
-   - `https://producer-server.com/federation/sidebar`
-
-### Consumer App Setup
-
-In the consumer Fresh app, install **Amber.js** and set up the alias
-configuration for the remote components.
-
-1. **Install the Plugin**
+2. **Step Two**
    ```typescript
-   import { extractDNA } from "@amber-js/amber";
-
-   // Sets up the barebones federation
-   extractDNA();
-
-   // Sets up the barebones federation
-   extractDNA();
-
-   // Sets up the barebones federation
-   extractDNA();
-
-   // Sets up the barebones federation
-   extractDNA();
+   console.log("Step Two");
    ```
 
-2. **Import Components by Alias**
 
-   Use aliases to load and render components dynamically.
+### Consumer Setup
 
+To consume the producer app, you need to set up the alias configuration for the remote components.
+
+1. **Step One**
    ```typescript
-   import { useEffect, useState } from "preact/hooks";
-
-   export default function DynamicComponentLoader(
-     { alias }: { alias: string },
-   ) {
-     const [Component, setComponent] = useState<preact.ComponentType | null>(
-       null,
-     );
-
-     useEffect(() => {
-       async function loadComponent() {
-         const module = await import(`/_federation/${alias}`);
-         setComponent(() => module.default);
-       }
-       loadComponent();
-     }, [alias]);
-
-     return Component ? <Component /> : <div>Loading...</div>;
-   }
+   console.log("Step One");
    ```
 
-   **Usage Example**:
+2. **Step Two**
    ```typescript
-   <DynamicComponentLoader alias="Header" />;
+   console.log("Step Two");
    ```
 
 ### API
 
-- **Producer Plugin**: `createFederationPlugin(paths: string[])`
-  - **`paths`**: An array of component names to expose, e.g.,
-    `["header", "footer"]`.
-
-- **Consumer Plugin**:
-  `createFederationAliasPlugin(aliasMap: Record<string, string>)`
-  - **`aliasMap`**: An object mapping aliases to URLs, e.g.,
-    `{ "Header": "https://producer-server.com/federation/header" }`.
 
 ---
 
 ## License
 
-Amber.js is open-source software licensed under the MIT License.
+Internal App is open-source software licensed under the MIT License.
 
----
-
-### Additional Notes
-
-- **Caching**: Add caching headers in production to reduce load times.
-- **Security**: Limit component exposure to only those intended for federation.
-- **Error Handling**: Ensure error handling for cases when components are not
-  available.

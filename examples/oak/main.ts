@@ -1,11 +1,11 @@
 import { Application } from "jsr:@oak/oak";
-import { App as HerdApp } from "#app";
+import { App as InternalApp } from "#app";
 
 const app = new Application();
 
-const herd = new HerdApp();
+const internalApp = new InternalApp();
 
-const middleware = herd.middleware;
+const middleware = internalApp.middleware;
 
 // app.use((ctx, next) => {
 //   console.log("middleware");

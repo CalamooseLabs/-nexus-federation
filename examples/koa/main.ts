@@ -1,12 +1,12 @@
 // @deno-types="npm:@types/koa@2.15.0"
 import Koa from "npm:koa@2.15.0";
-import { App as HerdApp } from "#app";
+import { App as InternalApp } from "#app";
 
 const app = new Koa();
 
-const herd = new HerdApp();
+const internalApp = new InternalApp();
 
-const middleware = herd.middleware;
+const middleware = internalApp.middleware;
 
 // app.use(async (ctx) => {
 //   ctx.body = "Hello World";

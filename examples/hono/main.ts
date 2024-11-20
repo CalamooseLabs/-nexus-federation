@@ -1,13 +1,13 @@
 import { Hono } from "jsr:@hono/hono";
-import { App as HerdApp } from "#app";
+import { App as InternalApp } from "#app";
 
 const app = new Hono();
 
 app.get("/", (_ctx) => new Response("Welcome to the Hono API!"));
 
-const herd = new HerdApp();
+const internalApp = new InternalApp();
 
-const middleware = herd.middleware;
+const middleware = internalApp.middleware;
 
 // app.use((_ctx, next) => {
 //   console.log("middleware");
