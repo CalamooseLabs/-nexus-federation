@@ -52,7 +52,8 @@ class Config {
     this.importMap = config?.importMap ?? defaultConfig.importMap;
     this.compilerOptions = config?.compilerOptions ??
       defaultConfig.compilerOptions;
-    this.configLocation = config?.configLocation ?? defaultConfig.configLocation;
+    this.configLocation = config?.configLocation ??
+      defaultConfig.configLocation;
     this.federation = config?.federation ?? defaultConfig.federation;
     this.plugins = config?.plugins ?? defaultConfig.plugins;
   }

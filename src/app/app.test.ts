@@ -56,25 +56,46 @@ Deno.test("Unit Tests:", async (subtest) => {
   };
 
   await subtest.step("Middleware - Context Only", async (task) => {
-    const request = new Request(`http://localhost:8000${FEDERATION_MANIFEST_PATH}`);
+    const request: MinRequest = new Request(
+      `http://localhost:8000${FEDERATION_MANIFEST_PATH}`,
+    );
+    const resp: MinResponse = {
+      headers: new Headers(),
+      status: 500,
+      body: "",
+    };
 
     await task.step("Req in Context", async () => {
-      const response = await testApp.middleware({req: request});
+      const response = await testApp.middleware({ req: request });
       await checkResponse(response);
     });
 
     await task.step("Request in Context", async () => {
-      const response = await testApp.middleware({request});
+      const response = await testApp.middleware({ request });
       await checkResponse(response);
     });
 
     await task.step("Custom Req Object", async () => {
-      const response = await testApp.middleware({req: {url: request.url, method: request.method}});
+      const response = await testApp.middleware({
+        req: { url: request.url, method: request.method },
+      });
       await checkResponse(response);
     });
 
     await task.step("Custom Request Object", async () => {
-      const response = await testApp.middleware({request: {url: request.url, method: request.method}});
+      const response = await testApp.middleware({
+        request: { url: request.url, method: request.method },
+      });
+      await checkResponse(response);
+    });
+
+    await task.step("Custom Resp Object", async () => {
+      const response = await testApp.middleware({ request, resp });
+      await checkResponse(response);
+    });
+
+    await task.step("Custom Response Object", async () => {
+      const response = await testApp.middleware({ request, response: resp });
       await checkResponse(response);
     });
   });
@@ -329,7 +350,7 @@ Deno.test("Integration Tests:", async (task) => {
             port: currentPort,
             signal: controller.signal,
             onListen: () => {},
-          }, (req, _info) => middleware({req}));
+          }, (req, _info) => middleware({ req }));
           return {
             close: () => controller.abort(),
           };
@@ -346,7 +367,7 @@ Deno.test("Integration Tests:", async (task) => {
             port: currentPort,
             signal: controller.signal,
             onListen: () => {},
-          }, (request, _info) => middleware({request}));
+          }, (request, _info) => middleware({ request }));
           return {
             close: () => controller.abort(),
           };

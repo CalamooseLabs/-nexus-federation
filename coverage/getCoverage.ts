@@ -17,7 +17,9 @@ async function runTests(type: string, coverageDir: string) {
     throw new Error(`Invalid test type: ${type}`);
   }
 
-  console.log(`\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m Running ${type} tests and saving coverage to ${coverageDir}`);
+  console.log(
+    `\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m Running ${type} tests and saving coverage to ${coverageDir}`,
+  );
 
   const cmd = new Deno.Command("deno", {
     args: [
@@ -43,9 +45,13 @@ async function runTests(type: string, coverageDir: string) {
 
   const fullPath = `file://${Deno.cwd()}/${coverageDir}/html/index.html`;
 
-  console.log(`\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m \x1b[4m\x1b[34m\x1b]8;;${fullPath}\x1b\\View Coverage Report\x1b]8;;\x1b\\\x1b[0m`);
+  console.log(
+    `\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m \x1b[4m\x1b[34m\x1b]8;;${fullPath}\x1b\\View Coverage Report\x1b]8;;\x1b\\\x1b[0m`,
+  );
 
-  console.log(`\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m \x1b[32mDone!\x1b[0m`);
+  console.log(
+    `\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m \x1b[32mDone!\x1b[0m`,
+  );
 }
 
 export async function getFolder(args: string[]): Promise<void> {

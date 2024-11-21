@@ -15,7 +15,7 @@ const defaultConfig: DefaultAppConfig = {
     nexus: "",
     autoDiscovery: true,
     apiKey: "",
-    name: ""
+    name: "",
   },
   plugins: [],
 };

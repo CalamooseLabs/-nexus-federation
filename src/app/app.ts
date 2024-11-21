@@ -162,7 +162,7 @@ class App {
     Object.defineProperty(AppContext, "headers", {
       get: () => {
         return resp.headers;
-      }
+      },
     });
 
     AppContext.set = (headerName: string, headerValue: string) => {

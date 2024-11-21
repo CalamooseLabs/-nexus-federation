@@ -24,11 +24,13 @@ class Handler {
   #setupRoutes(): void {
     this.#routes = {};
 
-    for (const entry of walkSync(this.#dirURL, {
-      includeDirs: false,
-      includeFiles: true,
-      exts: [".ts"],
-    })) {
+    for (
+      const entry of walkSync(this.#dirURL, {
+        includeDirs: false,
+        includeFiles: true,
+        exts: [".ts"],
+      })
+    ) {
       const path = entry.path.replace(this.#dirPath, "");
       let routePath = `${this.#basePath}${path.replace(".ts", "")}`;
       routePath = routePath.replace(/\[(\w+)\]/g, ":$1");
@@ -98,7 +100,10 @@ class Handler {
    * @param {string} path - The route path
    * @returns {Record<HTTPMethod, RouteHandler> | undefined} The route handler functions if found
    */
-  public async getRouteFn(path: string, method: HTTPMethod): Promise<RouteHandlerFn | undefined> {
+  public async getRouteFn(
+    path: string,
+    method: HTTPMethod,
+  ): Promise<RouteHandlerFn | undefined> {
     const routePath = this.#routes[path];
     if (!routePath) return undefined;
 
