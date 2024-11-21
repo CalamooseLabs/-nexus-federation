@@ -194,13 +194,17 @@ Deno.test("Unit Tests:", async (subtest) => {
     };
 
     await subtest.step("Valid Request", async () => {
-      const response = await testApp.fetch(request as Request, serveHandlerInfo);
+      const response = await testApp.fetch(
+        request as Request,
+        serveHandlerInfo,
+      );
       await checkResponse(response as Response);
     });
 
-
     await subtest.step("Invalid Request", async () => {
-      const badRequest = new Request("http://localhost:8000/bad");
+      const badRequest = new Request(
+        "http://localhost:8000/_federation/doesnotmatter/it/will/match/nothing",
+      );
       const response = await testApp.fetch(badRequest, serveHandlerInfo);
       assertEquals(response.status, 200);
       assertEquals(response.body, null);
