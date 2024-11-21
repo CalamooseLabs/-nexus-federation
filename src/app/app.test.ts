@@ -7,6 +7,7 @@ import {
 } from "jsr:@std/assert";
 
 const FEDERATION_MANIFEST_PATH = "/_federation/manifest.json";
+const MANIFEST_CONTENT = { "version": "1.0.0" };
 
 Deno.test("Unit Tests:", async (subtest) => {
   const testApp = new InternalApp();
@@ -45,6 +46,38 @@ Deno.test("Unit Tests:", async (subtest) => {
   await subtest.step("Empty Parameters Expects to Exit Early", () => {
     testApp.middleware({});
   });
+
+  const checkResponse = async (response: Response) => {
+    const manifest = await response.json();
+
+    assertEquals(response.status, 200);
+    assertEquals(response.headers.get("Content-Type"), "application/json");
+    assertObjectMatch(manifest, MANIFEST_CONTENT);
+  };
+
+  await subtest.step("Middleware - Context Only", async (task) => {
+    const request = new Request(`http://localhost:8000${FEDERATION_MANIFEST_PATH}`);
+
+    await task.step("Req in Context", async () => {
+      const response = await testApp.middleware({req: request});
+      await checkResponse(response);
+    });
+
+    await task.step("Request in Context", async () => {
+      const response = await testApp.middleware({request});
+      await checkResponse(response);
+    });
+
+    await task.step("Custom Req Object", async () => {
+      const response = await testApp.middleware({req: {url: request.url, method: request.method}});
+      await checkResponse(response);
+    });
+
+    await task.step("Custom Request Object", async () => {
+      const response = await testApp.middleware({request: {url: request.url, method: request.method}});
+      await checkResponse(response);
+    });
+  });
 });
 
 Deno.test("Integration Tests:", async (task) => {
@@ -53,8 +86,6 @@ Deno.test("Integration Tests:", async (task) => {
 
   const BASE_PORT = 8123;
   let currentPort = BASE_PORT;
-
-  const MANIFEST_CONTENT = { "version": "1.0.0" };
 
   const getManifest = async () => {
     try {

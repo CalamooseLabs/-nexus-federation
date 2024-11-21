@@ -254,12 +254,12 @@ class App {
       );
 
       // Get the route handler function for the matched route and method
-      const routeHandler = this.#handler.getRouteFn(matchedRoute);
+      const routeHandler = await this.#handler.getRouteFn(
+        matchedRoute,
+        ctx.method as HTTPMethod,
+      );
       if (routeHandler) {
-        const handler = routeHandler[ctx.method];
-        if (handler) {
-          return await handler(ctx);
-        }
+        return await routeHandler(ctx);
       }
     }
 

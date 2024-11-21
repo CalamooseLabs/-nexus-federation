@@ -1,6 +1,6 @@
 // @ts-self-types="./handler.d.ts"
 
-import { walk } from "@std/fs";
+import { walkSync } from "@std/fs";
 
 class Handler {
   #basePath: string;
@@ -21,42 +21,19 @@ class Handler {
    * @private
    * @returns {Promise<void>}
    */
-  async #setupRoutes(): Promise<void> {
+  #setupRoutes(): void {
     this.#routes = {};
 
-    const entries = await walk(this.#dirURL, {
+    for (const entry of walkSync(this.#dirURL, {
       includeDirs: false,
       includeFiles: true,
       exts: [".ts"],
-    });
-    // Get all .ts files from the directory
-    try {
-      for await (const entry of entries) {
-        // Remove the base path from the entry path
-        const path = entry.path.replace(this.#dirPath, "");
+    })) {
+      const path = entry.path.replace(this.#dirPath, "");
+      let routePath = `${this.#basePath}${path.replace(".ts", "")}`;
+      routePath = routePath.replace(/\[(\w+)\]/g, ":$1");
 
-        // Generate the route path by combining basePath with filename (minus .ts)
-        let routePath = `${this.#basePath}${path.replace(".ts", "")}`;
-
-        // Change any variable path of [variableName] to :variableName
-        routePath = routePath.replace(/\[(\w+)\]/g, ":$1");
-
-        // Import the module dynamically
-        const module = await import(entry.path);
-
-        this.#routes[routePath] = {};
-
-        // Check for HTTP method exports (get, post, etc.)
-        const methods: HTTPMethod[] = ["GET", "POST", "PUT", "DELETE"];
-        for (const method of methods) {
-          if (module[method]) {
-            this.#routes[routePath][method] = module[method];
-          }
-        }
-      }
-    } catch (error) {
-      console.error(`Error reading routes directory: ${error}`);
-      throw error;
+      this.#routes[routePath] = entry.path as RoutePath; // Store the path instead of importing
     }
   }
 
@@ -107,7 +84,7 @@ class Handler {
           matches = false;
           break;
         }
-        if (matches && this.#routes[registeredPath][method as HTTPMethod]) {
+        if (matches && this.#routes[registeredPath]) {
           return registeredPath;
         }
       }
@@ -121,10 +98,12 @@ class Handler {
    * @param {string} path - The route path
    * @returns {Record<HTTPMethod, RouteHandler> | undefined} The route handler functions if found
    */
-  public getRouteFn(path: string): RouteHandler | undefined {
-    const route = this.#routes[path];
-    if (!route) return undefined;
-    return route as RouteHandler;
+  public async getRouteFn(path: string, method: HTTPMethod): Promise<RouteHandlerFn | undefined> {
+    const routePath = this.#routes[path];
+    if (!routePath) return undefined;
+
+    const module = await import(routePath); // Import the module dynamically
+    return module[method] as RouteHandlerFn | undefined;
   }
 
   /**

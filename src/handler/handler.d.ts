@@ -1,12 +1,10 @@
 type Routes = {
-  [path: string]: RouteHandler;
+  [path: string]: RoutePath;
 };
+
+type RoutePath = `/${string}`;
 
 type RouteHandlerFn = (ctx: AppContext) => Response | Promise<Response>;
-
-type RouteHandler = {
-  [key in HTTPMethod]?: RouteHandlerFn;
-};
 
 type ExtractPathParams<T extends string> = T extends
   `${infer Start}/${infer Rest}`
