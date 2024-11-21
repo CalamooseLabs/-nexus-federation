@@ -58,9 +58,6 @@ class Handler {
     try {
       pathname = new URL(url).pathname;
     } catch (_e) {
-      if (!url) {
-        throw new Error("Federation Error: URL is blank");
-      }
       pathname = url.toString();
     }
 

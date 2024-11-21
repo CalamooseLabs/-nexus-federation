@@ -28,10 +28,7 @@ class Config {
     // Read config file
     try {
       const parsedConfig = parse(Deno.readTextFileSync(this.configLocation));
-      // Ensure parsedConfig is an object before assigning
-      denoConfig = (typeof parsedConfig === "object" && parsedConfig !== null)
-        ? parsedConfig as DenoJsonConfig
-        : null;
+      denoConfig = parsedConfig as DenoConfig;
     } catch {
       // Config file not found, using defaults
       denoConfig = {
