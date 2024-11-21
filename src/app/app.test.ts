@@ -43,8 +43,9 @@ Deno.test("Unit Tests:", async (subtest) => {
     );
   });
 
-  await subtest.step("Empty Parameters Expects to Exit Early", () => {
-    testApp.middleware({});
+  await subtest.step("Empty Parameters Expects to Exit Early", async () => {
+    const response = await testApp.middleware({});
+    assertEquals(response, undefined);
   });
 
   const checkResponse = async (response: Response) => {
