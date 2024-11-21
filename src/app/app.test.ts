@@ -55,16 +55,39 @@ Deno.test("Unit Tests:", async (subtest) => {
     assertObjectMatch(manifest, MANIFEST_CONTENT);
   };
 
-  await subtest.step("Middleware - Context Only", async (task) => {
-    const request: MinRequest = new Request(
-      `http://localhost:8000${FEDERATION_MANIFEST_PATH}`,
-    );
-    const resp: MinResponse = {
-      headers: new Headers(),
-      status: 500,
-      body: "",
-    };
+  const request: MinRequest = new Request(
+    `http://localhost:8000${FEDERATION_MANIFEST_PATH}`,
+  );
+  const resp: MinResponse = {
+    headers: new Headers(),
+    status: 500,
+    body: "",
+    set: function (name: string, value: string) {
+      if (!this.headers) {
+        this.headers = new Headers();
+      }
 
+      this.headers.set(name, value);
+    },
+    send: function (body?: HTTPBody) {
+      return new Response(String(body) ?? this.body ?? "", {
+        headers: this.headers,
+        status: this.status,
+      });
+    },
+  };
+  const nextFunction: MiddlewareNext = () => {
+    return new Promise((resolve) => {
+      resolve(
+        new Response("Should not be called", {
+          headers: new Headers(),
+          status: 501,
+        }),
+      );
+    });
+  };
+
+  await subtest.step("Middleware - Context Only", async (task) => {
     await task.step("Req in Context", async () => {
       const response = await testApp.middleware({ req: request });
       await checkResponse(response);
@@ -78,6 +101,7 @@ Deno.test("Unit Tests:", async (subtest) => {
     await task.step("Custom Req Object", async () => {
       const response = await testApp.middleware({
         req: { url: request.url, method: request.method },
+        body: "error",
       });
       await checkResponse(response);
     });
@@ -97,6 +121,89 @@ Deno.test("Unit Tests:", async (subtest) => {
     await task.step("Custom Response Object", async () => {
       const response = await testApp.middleware({ request, response: resp });
       await checkResponse(response);
+    });
+  });
+
+  await subtest.step("Middleware - Request Only", async (task) => {
+    await task.step("Request Only", async () => {
+      const response = await testApp.middleware(request);
+      await checkResponse(response);
+    });
+  });
+
+  await subtest.step("Middleware - Context and Next", async (task) => {
+    await task.step("Req in Context and Next", async () => {
+      const response = await testApp.middleware({ req: request }, nextFunction);
+      await checkResponse(response as Response);
+    });
+
+    await task.step("Request in Context and Next", async () => {
+      const response = await testApp.middleware({ request }, nextFunction);
+      await checkResponse(response as Response);
+    });
+
+    await task.step("Custom Response in Context and Next", async () => {
+      const response = await testApp.middleware(
+        { request, response: resp },
+        nextFunction,
+      );
+      await checkResponse(response as Response);
+    });
+
+    await task.step("Custom Resp Object in Context and Next", async () => {
+      const response = await testApp.middleware(
+        { request, resp },
+        nextFunction,
+      );
+      await checkResponse(response as Response);
+    });
+  });
+
+  await subtest.step(
+    "Middleware - Context and Serve Handler Info",
+    async (task) => {
+      const serveHandlerInfo: ServeHandlerInfo = {
+        remoteAddr: {
+          transport: "tcp",
+          hostname: "127.0.0.1",
+          port: 8000,
+        },
+      };
+
+      await task.step("Request and Serve Handler Info", async () => {
+        const response = await testApp.middleware(request, serveHandlerInfo);
+        await checkResponse(response as Response);
+      });
+    },
+  );
+
+  await subtest.step("Middleware - Request, Response, Next", async (task) => {
+    await task.step("Request, Response, Next", async () => {
+      const response = await testApp.middleware(request, resp, nextFunction);
+      await checkResponse(response as Response);
+    });
+  });
+
+  await subtest.step("Fetch for Deno.Serve", async (subtest) => {
+    const serveHandlerInfo: ServeHandlerInfo = {
+      remoteAddr: {
+        transport: "tcp",
+        hostname: "127.0.0.1",
+        port: 8000,
+      },
+    };
+
+    await subtest.step("Valid Request", async () => {
+      const response = await testApp.fetch(request as Request, serveHandlerInfo);
+      await checkResponse(response as Response);
+    });
+
+
+    await subtest.step("Invalid Request", async () => {
+      const badRequest = new Request("http://localhost:8000/bad");
+      const response = await testApp.fetch(badRequest, serveHandlerInfo);
+      assertEquals(response.status, 200);
+      assertEquals(response.body, null);
     });
   });
 });

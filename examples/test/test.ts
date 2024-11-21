@@ -9,3 +9,7 @@ console.log(request);
 const response = await app.middleware(request);
 
 console.log(response);
+
+const r = new Response();
+
+console.log(r);
