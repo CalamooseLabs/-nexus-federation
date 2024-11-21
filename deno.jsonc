@@ -5,7 +5,9 @@
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
-    "./types": "./types.ts"
+    "./types": "./types.ts",
+    "./app": "./src/app/mod.ts",
+    "./router": "./src/router/mod.ts"
   },
   "publish": {
     "include": [
@@ -20,16 +22,41 @@
     ]
   },
   "tasks": {
-    "start": "deno serve --lock app.tsx",
-    "dev": "deno serve -A --port 8001 --reload --watch main.tsx",
-    "check": "deno check ./src/**/*.ts",
-    "check-examples": "deno check ./examples/**/*.ts",
-    "unit-tests": "deno check ./src/ && deno test ./src/**/*.test.ts --filter Unit --allow-read",
-    "unit-tests-coverage": "deno run -A ./coverage/getCoverage.ts --unit",
-    "integration-tests": "deno check ./src/ && deno test ./src/**/*.test.ts --filter Integration --allow-read --allow-env --allow-net",
-    "integration-tests-coverage": "deno run -A ./coverage/getCoverage.ts --integration",
-    "all-tests": "deno check ./src/ && deno test ./src/**/*.test.ts --allow-read --allow-env --allow-net",
-    "all-tests-coverage": "deno run -A ./coverage/getCoverage.ts --all"
+    "check": {
+      "description": "Run Type Checking on Source Files",
+      "command": "deno check ./src/**/*.ts"
+    },
+    "check-examples": {
+      "description": "Run Type Checking on Examples",
+      "command": "deno check ./examples/**/*.ts"
+    },
+    "unit-tests": {
+      "description": "Run Unit Tests",
+      "dependencies": ["check"],
+      "command": "deno test ./src/**/*.test.ts --filter Unit --allow-read"
+    },
+    "unit-tests-coverage": {
+      "description": "Run Unit Tests Coverage",
+      "command": "deno run -A ./coverage/getCoverage.ts --unit"
+    },
+    "integration-tests": {
+      "description": "Run Integration Tests",
+      "dependencies": ["check"],
+      "command": "deno test ./src/**/*.test.ts --filter Integration --allow-read --allow-env --allow-net"
+    },
+    "integration-tests-coverage": {
+      "description": "Run Integration Tests Coverage",
+      "command": "deno run -A ./coverage/getCoverage.ts --integration"
+    },
+    "all-tests": {
+      "description": "Run All Tests",
+      "dependencies": ["check"],
+      "command": "deno test ./src/**/*.test.ts --allow-read --allow-env --allow-net"
+    },
+    "all-tests-coverage": {
+      "description": "Run All Tests Coverage",
+      "command": "deno run -A ./coverage/getCoverage.ts --all"
+    }
   },
   "importMap": "./import_map.json",
   "compilerOptions": {
