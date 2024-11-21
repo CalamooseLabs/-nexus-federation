@@ -1,15 +1,10 @@
-import { App } from "#app";
+const cmd = new Deno.Command(Deno.execPath(), {
+  args: ["task", "all-tests"],
+});
 
-const app = new App();
+const { code, stdout } = await cmd.output();
 
-const request = new Request("http://localhost:8000/_federation/manifest.json");
+const output = new TextDecoder().decode(stdout);
 
-console.log(request);
-
-const response = await app.middleware(request);
-
-console.log(response);
-
-const r = new Response();
-
-console.log(r);
+console.log(code);
+console.log(output);

@@ -10,7 +10,7 @@ const defaultConfig: DefaultAppConfig = {
   imports: [],
   importMap: {},
   compilerOptions: {},
-  configLocation: "./deno.jsonc",
+  configLocation: "./deno.json",
   federation: {
     nexus: "",
     autoDiscovery: true,

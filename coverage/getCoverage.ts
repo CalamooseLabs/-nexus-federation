@@ -1,49 +1,56 @@
-import { parse } from "jsr:@std/jsonc";
+import config from "../deno.json" with { type: "json" };
 
 async function runTests(type: string, coverageDir: string) {
-  let testSuite: string;
   let reportType: string;
+  const srcDir = `${Deno.cwd()}/src`;
+  const args: string[] = [
+    "test",
+    `${srcDir}`,
+    "--allow-read",
+    "--allow-env",
+    "--allow-net",
+  ];
 
   if (type === "all") {
-    testSuite = "all-tests";
     reportType = "All";
   } else if (type === "unit") {
-    testSuite = "unit-tests";
+    args.push("--filter", "Unit");
     reportType = "Unit";
   } else if (type === "integration") {
-    testSuite = "integration-tests";
+    args.push("--filter", "Integration");
     reportType = "Integration";
   } else {
     throw new Error(`Invalid test type: ${type}`);
   }
 
+  args.push(`--coverage=${coverageDir}`);
+
   console.log(
     `\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m Running ${type} tests and saving coverage to ${coverageDir}`,
   );
 
-  const cmd = new Deno.Command("deno", {
-    args: [
-      "task",
-      testSuite,
-      "--coverage=" + coverageDir,
-    ],
+  const cmd = new Deno.Command(Deno.execPath(), {
+    args,
   });
 
-  const { success } = await cmd.output();
-  if (!success) {
-    throw new Error(`${type} tests failed`);
+  const { code, stderr } = await cmd.output();
+  if (code !== 0) {
+    const error = new TextDecoder().decode(stderr);
+    throw new Error(`${type} tests failed: ${error}`);
   }
 
-  const coverageGenerator = new Deno.Command("deno", {
+  const coverageGenerator = new Deno.Command(Deno.execPath(), {
     args: ["coverage", coverageDir, "--html"],
   });
 
-  const { success: coverageSuccess } = await coverageGenerator.output();
-  if (!coverageSuccess) {
-    throw new Error(`Failed to generate coverage report`);
+  const { code: coverageCode, stderr: coverageError } = await coverageGenerator
+    .output();
+  if (coverageCode !== 0) {
+    const covError = new TextDecoder().decode(coverageError);
+    throw new Error(`Failed to generate coverage report: ${covError}`);
   }
 
-  const fullPath = `file://${Deno.cwd()}/${coverageDir}/html/index.html`;
+  const fullPath = `file://${coverageDir}/html/index.html`;
 
   console.log(
     `\x1b[1m\x1b[33m[${reportType} Tests Report]:\x1b[0m \x1b[4m\x1b[34m\x1b]8;;${fullPath}\x1b\\View Coverage Report\x1b]8;;\x1b\\\x1b[0m`,
@@ -55,10 +62,6 @@ async function runTests(type: string, coverageDir: string) {
 }
 
 export async function getFolder(args: string[]): Promise<void> {
-  const config = await parse(await Deno.readTextFile("deno.jsonc")) as {
-    version?: string;
-  };
-  if (!config) throw new Error("Failed to parse deno.jsonc");
   const version = config?.version ?? "unknown";
   const now = new Date();
   const timestamp = now.getFullYear().toString() +
@@ -68,23 +71,13 @@ export async function getFolder(args: string[]): Promise<void> {
     now.getMinutes().toString().padStart(2, "0") +
     now.getSeconds().toString().padStart(2, "0");
 
-  if (args.includes("--unit")) {
-    await runTests("unit", `coverage/unit-tests/${version}/${timestamp}`);
-    return;
-  }
-  if (args.includes("--integration")) {
-    await runTests(
-      "integration",
-      `coverage/integration-tests/${version}/${timestamp}`,
-    );
-    return;
-  }
-  if (args.includes("--all")) {
-    await runTests("all", `coverage/all-tests/${version}/${timestamp}`);
-    return;
-  }
+  const type = args.find((arg) => arg.includes("--"))?.replace("--", "");
 
-  throw new Error("Must specify --unit, --integration, or --all flag");
+  const coverageRoot =
+    `${Deno.cwd()}/coverage/${type}-tests/${version}/${timestamp}`;
+  await Deno.mkdir(coverageRoot, { recursive: true });
+
+  await runTests(type as string, coverageRoot);
 }
 
 getFolder(Deno.args);
