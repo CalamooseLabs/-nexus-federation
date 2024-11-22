@@ -1,8 +1,14 @@
-<div style="text-align: center;">
-  <p style="font-size: 1.5em; margin: 0; padding-bottom: 1em;"><i>Calamoose Labs Presents</i></p>
+<p align="center" style="font-size: 1.5em;">
+  <i>Calamoose Labs Presents</i>
+</p>
+<p align="center">
   <img height="250px" src="./static/kintsugi-logo.png" alt="Logo" />
-  <h1 style="font-size: 2em; font-weight: bold; color: gold; padding-bottom: 2em;"><u>K I N T S U G I</u></h1>
-</div>
+</p>
+<h1 align="center" style="color: gold;">
+  <u>K I N T S U G I</u>
+  <br />
+  <br />
+</h1>
 
 **Internal App** is a module federation plugin for Deno, inspired by the concept
 of module federation, micro frontends, and microservices. This middleware allows
@@ -54,14 +60,12 @@ remote components.
    console.log("Step Two");
    ```
 
-### API
-
 ---
 
 ## License
 
 Internal App is open-source software licensed under the MIT License.
 
-<div style="text-align: right;">
-  <p style="display: inline-block; margin: 0; padding-right: 0.75em; vertical-align: bottom;">© 2024 Calamoose Labs, Inc.</p> <img src="./static/logo.png" alt="Calamoose Labs Logo" height="20px" style="vertical-align: middle;">
-</div>
+<p align="right">
+  <span>© 2024 Calamoose Labs, Inc.</span> <img src="./static/logo.png" alt="Calamoose Labs Logo" height="20px">
+</p>
