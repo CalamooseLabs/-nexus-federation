@@ -37,6 +37,7 @@ class Handler {
 
       this.#routes[routePath] = entry.path as RoutePath; // Store the path instead of importing
     }
+    console.log(this.#routes);
   }
 
   /**
