@@ -67,5 +67,7 @@ remote components.
 Internal App is open-source software licensed under the MIT License.
 
 <p align="right">
-  <span>© 2024 Calamoose Labs, Inc.</span> <img src="./static/logo.png" alt="Calamoose Labs Logo" height="20px">
+  <br />
+  <br />
+  <span>© 2024 Calamoose Labs, Inc.</span> &nbsp; <img src="./static/logo.png" alt="Calamoose Labs Logo" height="15px">
 </p>
