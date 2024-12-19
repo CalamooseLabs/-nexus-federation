@@ -4,6 +4,11 @@ import { parse } from "@std/jsonc";
 
 import { defaultConfig } from "./config.default.ts";
 
+/**
+ * The Config class is responsible for loading the configuration for the application.
+ * It will load the configuration from the config file, and then use that to set the configuration for the application.
+ * It will also be responsible for providing the manifest to the server.
+ */
 class Config {
   version: DefaultAppConfig["version"];
   remoteMap: DefaultAppConfig["remoteMap"];

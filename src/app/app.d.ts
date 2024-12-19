@@ -74,3 +74,5 @@ interface AppContext {
 type ServeHandlerInfo = {
   remoteAddr?: Deno.Addr;
 };
+
+type PluginFn = () => void;

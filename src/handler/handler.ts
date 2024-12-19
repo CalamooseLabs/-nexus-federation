@@ -2,6 +2,10 @@
 
 import { walkSync } from "@std/fs";
 
+/**
+ * The Handler class is responsible for handling the routes for the application.
+ * This will just be used internally by the server.
+ */
 class Handler {
   #basePath: string;
   #dirURL: URL;

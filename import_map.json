@@ -8,6 +8,8 @@
     "#router": "./src/router/mod.ts",
     "@std/jsonc": "jsr:@std/jsonc@^1.0.1",
     "@std/fs": "jsr:@std/fs@^1.0.5",
-    "@deno/emit": "jsr:@deno/emit@^0.46.0"
+    "@std/path": "jsr:@std/path",
+    "esbuild": "npm:esbuild",
+    "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader"
   }
 }
