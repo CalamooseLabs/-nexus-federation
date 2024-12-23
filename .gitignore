@@ -7,8 +7,8 @@
 
 # Coverage Test Results
 **/_coverage/unit-tests/*
-**/!_coverage/unit-tests/.gitkeep
+!**/_coverage/unit-tests/.gitkeep
 **/_coverage/integration-tests/*
-**/!_coverage/integration-tests/.gitkeep
+!**/_coverage/integration-tests/.gitkeep
 **/_coverage/all-tests/*
-**/!_coverage/all-tests/.gitkeep
+!**/_coverage/all-tests/.gitkeep
