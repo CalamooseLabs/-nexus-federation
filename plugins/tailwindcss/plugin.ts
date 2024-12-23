@@ -9,23 +9,27 @@ import autoprefixer from "autoprefixer";
 import cssnano from "cssnano";
 
 class TailwindCSSPlugin extends BuilderPlugin {
-  #tailwindConfig: TailwindConfig;
+  #tailwindConfig: Tailwind.Config;
+  #baseCSS: string;
 
-  constructor(config?: TailwindConfig) {
+  constructor(config?: Tailwind.Config, baseCSS?: string) {
     super({
       name: "TailwindCSS",
     });
 
+    this.#baseCSS = baseCSS ?? defaultBaseCSS;
     this.#tailwindConfig = config ?? defaultTailwindConfig;
   }
 
-  override afterBuild() {
+  override async beforeBuild(entryPoint: string): Promise<string> {
+    const result = await this.#processCSS([entryPoint]);
+    return result;
   }
 
   async #processCSS(
-    content: TailwindContent,
-    tailwindConfig: TailwindProcessConfig = defaultTailwindConfig,
-    baseCSS: string = defaultBaseCSS,
+    content: Tailwind.Content,
+    tailwindConfig: Tailwind.ProcessConfig = this.#tailwindConfig,
+    baseCSS: string = this.#baseCSS,
   ): Promise<string> {
     try {
       // Initialize PostCSS with Tailwind and other plugins
@@ -52,9 +56,11 @@ class TailwindCSSPlugin extends BuilderPlugin {
       return result.css;
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`PostCSS failed: ${error.message}`);
+        throw new Error(`[TailwindCSSPlugin] PostCSS failed: ${error.message}`);
       } else {
-        throw new Error(`PostCSS failed: ${JSON.stringify(error)}`);
+        throw new Error(
+          `[TailwindCSSPlugin] PostCSS failed: ${JSON.stringify(error)}`,
+        );
       }
     }
   }

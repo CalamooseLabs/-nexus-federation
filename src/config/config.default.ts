@@ -1,4 +1,4 @@
-const defaultConfig: DefaultAppConfig = {
+const defaultConfig: Config.DefaultAppConfig = {
   version: "1.0.0",
   remoteMap: {},
   basePath: "/_federation",

@@ -1,5 +1,5 @@
 class AppPlugin {
-  constructor(public name: string, public options: any) {}
+  constructor() {}
 }
 
 export default AppPlugin;

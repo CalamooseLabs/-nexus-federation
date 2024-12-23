@@ -56,10 +56,10 @@ Deno.test("Unit Tests:", async (subtest) => {
     assertObjectMatch(manifest, MANIFEST_CONTENT);
   };
 
-  const request: MinRequest = new Request(
+  const request: Kintsugi.MinRequest = new Request(
     `http://localhost:8000${FEDERATION_MANIFEST_PATH}`,
   );
-  const resp: MinResponse = {
+  const resp: Kintsugi.MinResponse = {
     headers: new Headers(),
     status: 500,
     body: "",
@@ -70,14 +70,14 @@ Deno.test("Unit Tests:", async (subtest) => {
 
       this.headers.set(name, value);
     },
-    send: function (body?: HTTPBody) {
+    send: function (body?: Kintsugi.HTTPBody) {
       return new Response(String(body) ?? this.body ?? "", {
         headers: this.headers,
         status: this.status,
       });
     },
   };
-  const nextFunction: MiddlewareNext = () => {
+  const nextFunction: Kintsugi.MiddlewareNext = () => {
     return new Promise((resolve) => {
       resolve(
         new Response("Should not be called", {
@@ -91,12 +91,12 @@ Deno.test("Unit Tests:", async (subtest) => {
   await subtest.step("Middleware - Context Only", async (task) => {
     await task.step("Req in Context", async () => {
       const response = await testApp.middleware({ req: request });
-      await checkResponse(response);
+      await checkResponse(response!);
     });
 
     await task.step("Request in Context", async () => {
       const response = await testApp.middleware({ request });
-      await checkResponse(response);
+      await checkResponse(response!);
     });
 
     await task.step("Custom Req Object", async () => {
@@ -104,31 +104,31 @@ Deno.test("Unit Tests:", async (subtest) => {
         req: { url: request.url, method: request.method },
         body: "error",
       });
-      await checkResponse(response);
+      await checkResponse(response!);
     });
 
     await task.step("Custom Request Object", async () => {
       const response = await testApp.middleware({
         request: { url: request.url, method: request.method },
       });
-      await checkResponse(response);
+      await checkResponse(response!);
     });
 
     await task.step("Custom Resp Object", async () => {
       const response = await testApp.middleware({ request, resp });
-      await checkResponse(response);
+      await checkResponse(response!);
     });
 
     await task.step("Custom Response Object", async () => {
       const response = await testApp.middleware({ request, response: resp });
-      await checkResponse(response);
+      await checkResponse(response!);
     });
   });
 
   await subtest.step("Middleware - Request Only", async (task) => {
     await task.step("Request Only", async () => {
       const response = await testApp.middleware(request);
-      await checkResponse(response);
+      await checkResponse(response!);
     });
   });
 
@@ -163,7 +163,7 @@ Deno.test("Unit Tests:", async (subtest) => {
   await subtest.step(
     "Middleware - Context and Serve Handler Info",
     async (task) => {
-      const serveHandlerInfo: ServeHandlerInfo = {
+      const serveHandlerInfo: Kintsugi.ServeHandlerInfo = {
         remoteAddr: {
           transport: "tcp",
           hostname: "127.0.0.1",
@@ -186,7 +186,7 @@ Deno.test("Unit Tests:", async (subtest) => {
   });
 
   await subtest.step("Fetch for Deno.Serve", async (subtest) => {
-    const serveHandlerInfo: ServeHandlerInfo = {
+    const serveHandlerInfo: Kintsugi.ServeHandlerInfo = {
       remoteAddr: {
         transport: "tcp",
         hostname: "127.0.0.1",
@@ -240,7 +240,9 @@ Deno.test("Integration Tests:", async (task) => {
     }
   };
 
-  async function withHTTP(createServer: () => { close: () => void }) {
+  async function withHTTP(
+    createServer: () => { close: () => void },
+  ) {
     const server = await createServer();
     try {
       await getManifest();

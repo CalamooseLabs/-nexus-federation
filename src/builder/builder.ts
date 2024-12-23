@@ -15,13 +15,15 @@ class Builder {
   constructor() {
   }
 
-  public async bundle(options: BundleOptions): Promise<BundleResult> {
+  public async bundle(
+    options: Builder.BundleOptions,
+  ): Promise<Builder.BundleResult> {
     const {
       entryPoint,
       target,
       minify = true,
       sourcemap = true,
-      importMap = {} as BundleOptions["importMap"],
+      importMap = {} as Builder.BundleOptions["importMap"],
       compilerOptions,
       splitting = false,
       outdir = "dist",

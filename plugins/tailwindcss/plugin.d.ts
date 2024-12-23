@@ -1,89 +1,84 @@
-type TailwindFilePath = string;
-type TailwindRawFile = { raw: string; extension?: string };
+declare namespace Tailwind {
+  type FilePath = string;
+  type RawFile = { raw: string; extension?: string };
 
-type TailwindExpand<T> = T extends object
-  ? T extends infer O ? { [K in keyof O]: TailwindExpand<O[K]> }
-  : never
-  : T;
+  type Expand<T> = T extends object
+    ? T extends infer O ? { [K in keyof O]: Expand<O[K]> }
+    : never
+    : T;
 
-type TailwindFutureConfigValues =
-  | "hoverOnlyWhenSupported"
-  | "respectDefaultRingColorOpacity"
-  | "disableColorOpacityUtilitiesByDefault"
-  | "relativeContentPathsByDefault";
+  type FutureConfigValues =
+    | "hoverOnlyWhenSupported"
+    | "respectDefaultRingColorOpacity"
+    | "disableColorOpacityUtilitiesByDefault"
+    | "relativeContentPathsByDefault";
 
-type TailwindFutureConfig =
-  | TailwindExpand<"all" | Partial<Record<TailwindFutureConfigValues, boolean>>>
-  | [];
+  type FutureConfig =
+    | Expand<"all" | Partial<Record<FutureConfigValues, boolean>>>
+    | [];
 
-type TailwindExperimentalConfigValues =
-  | "optimizeUniversalDefaults"
-  | "matchVariant";
-type TailwindExperimentalConfig =
-  | TailwindExpand<
-    "all" | Partial<Record<TailwindExperimentalConfigValues, boolean>>
-  >
-  | [];
+  type ExperimentalConfigValues =
+    | "optimizeUniversalDefaults"
+    | "matchVariant";
+  type ExperimentalConfig =
+    | Expand<
+      "all" | Partial<Record<ExperimentalConfigValues, boolean>>
+    >
+    | [];
 
-type TailwindDarkModeConfig =
-  // Use the `media` query strategy.
-  | "media"
-  // Use the `class` strategy, which requires a `.dark` class on the `html`.
-  | "class"
-  // Use the `class` strategy with a custom class instead of `.dark`.
-  | ["class", string]
-  // Use the `selector` strategy — same as `class` but uses `:where()` for more predicable behavior
-  | "selector"
-  // Use the `selector` strategy with a custom selector instead of `.dark`.
-  | ["selector", string]
-  // Use the `variant` strategy, which allows you to completely customize the selector
-  // It takes a string or an array of strings, which are passed directly to `addVariant()`
-  | ["variant", string | string[]];
+  type DarkModeConfig =
+    | "media"
+    | "class"
+    | ["class", string]
+    | "selector"
+    | ["selector", string]
+    | ["variant", string | string[]];
 
-type ExtractorTailwindFN = (content: string) => string[];
-type TransformerTailwindFN = (content: string) => string;
+  type ExtractorFN = (content: string) => string[];
+  type TransformerFN = (content: string) => string;
 
-type TailwindContentConfig = (
-  TailwindRawFile | TailwindFilePath | string
-)[] | {
-  files: (TailwindFilePath | TailwindRawFile)[];
-  relative?: boolean;
-  extract?: ExtractorTailwindFN | { [extension: string]: ExtractorTailwindFN };
-  transform?: TransformerTailwindFN | {
-    [extension: string]: TransformerTailwindFN;
+  type ContentConfig = (
+    RawFile | FilePath | string
+  )[] | {
+    files: (FilePath | RawFile)[];
+    relative?: boolean;
+    extract?: ExtractorFN | { [extension: string]: ExtractorFN };
+    transform?: TransformerFN | {
+      [extension: string]: TransformerFN;
+    };
   };
-};
 
-interface TailwindOptionalConfig {
-  important: Partial<string | boolean>;
-  prefix: Partial<string>;
-  separator: Partial<string>;
-  safelist: Array<
-    string | {
-      pattern: RegExp;
-      variants?: string[];
-    }
-  >;
-  blocklist: Array<string>;
-  presets: Array<Partial<TailwindConfig>>;
-  future: Partial<TailwindFutureConfig>;
-  experimental: Partial<TailwindExperimentalConfig>;
-  darkMode: Partial<TailwindDarkModeConfig>;
-  // deno-lint-ignore no-explicit-any
-  theme: Partial<any & { extend: Partial<any> }>;
-  // deno-lint-ignore no-explicit-any
-  corePlugins: Partial<any>;
-  // deno-lint-ignore no-explicit-any
-  plugins: Partial<any>;
-  // deno-lint-ignore no-explicit-any
-  [key: string]: any;
+  interface OptionalConfig {
+    important: Partial<string | boolean>;
+    prefix: Partial<string>;
+    separator: Partial<string>;
+    safelist: Array<
+      string | {
+        pattern: RegExp;
+        variants?: string[];
+      }
+    >;
+    blocklist: Array<string>;
+    presets: Array<Partial<Config>>;
+    future: Partial<FutureConfig>;
+    experimental: Partial<ExperimentalConfig>;
+    darkMode: Partial<DarkModeConfig>;
+    // deno-lint-ignore no-explicit-any
+    theme: Partial<any & { extend: Partial<any> }>;
+    // deno-lint-ignore no-explicit-any
+    corePlugins: Partial<any>;
+    // deno-lint-ignore no-explicit-any
+    plugins: Partial<any>;
+    // deno-lint-ignore no-explicit-any
+    [key: string]: any;
+  }
+
+  interface RequiredConfig {
+    content: ContentConfig;
+  }
+
+  type Config = RequiredConfig & Partial<OptionalConfig>;
+
+  type Content = Config["content"];
+  type ProcessConfig = Omit<Config, "content">;
 }
-
-interface RequiredTailwindConfig {
-  content: TailwindContentConfig;
-}
-
-type TailwindConfig = RequiredTailwindConfig & Partial<TailwindOptionalConfig>;
-
-type TailwindContent = TailwindConfig["content"];
-type TailwindProcessConfig = Omit<TailwindConfig, "content">;

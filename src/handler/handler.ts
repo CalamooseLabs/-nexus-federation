@@ -10,7 +10,7 @@ class Handler {
   #basePath: string;
   #dirURL: URL;
   #dirPath: string;
-  #routes!: Routes;
+  #routes!: Handler.Routes;
 
   constructor(dirURL: URL, basePath: string = "/_federation") {
     this.#basePath = basePath;
@@ -39,7 +39,7 @@ class Handler {
       let routePath = `${this.#basePath}${path.replace(".ts", "")}`;
       routePath = routePath.replace(/\[(\w+)\]/g, ":$1");
 
-      this.#routes[routePath] = entry.path as RoutePath; // Store the path instead of importing
+      this.#routes[routePath] = entry.path as Handler.RoutePath; // Store the path instead of importing
     }
     console.log(this.#routes);
   }
@@ -47,11 +47,13 @@ class Handler {
   /**
    * Matches a request against registered routes to find the appropriate handler.
    * @public
-   * @param {Context | MinRequest} reqOrCtx - Request or context object
+   * @param {Kintsugi.Context | Kintsugi.MinRequest} reqOrCtx - Request or context object
    * @returns {string | undefined} Matched route path or undefined if no match
    * @throws {Error} When URL is blank
    */
-  matchRoute(reqOrCtx: Context | MinRequest): string | undefined {
+  matchRoute(
+    reqOrCtx: Kintsugi.Context | Kintsugi.MinRequest,
+  ): string | undefined {
     // Get URL from context or request
     const url: string | URL | undefined =
       ("req" in reqOrCtx ? reqOrCtx.req?.url : undefined) ??
@@ -105,12 +107,12 @@ class Handler {
   public async getRouteFn(
     path: string,
     method: HTTPMethod,
-  ): Promise<RouteHandlerFn | undefined> {
+  ): Promise<Handler.RouteHandlerFn | undefined> {
     const routePath = this.#routes[path];
     if (!routePath) return undefined;
 
     const module = await import(routePath); // Import the module dynamically
-    return module[method] as RouteHandlerFn | undefined;
+    return module[method] as Handler.RouteHandlerFn | undefined;
   }
 
   /**
@@ -119,13 +121,13 @@ class Handler {
    * @template T - The path pattern type
    * @param {T} pattern - The route pattern with parameter placeholders
    * @param {string | URL} url - The URL to extract parameters from
-   * @returns {ExtractPathParams<T>} Object containing extracted path parameters
+   * @returns {Handler.ExtractPathParams<T>} Object containing extracted path parameters
    * @throws {Error} When URL is blank
    */
   public getPathParams<T extends string>(
     pattern: T,
     url: string | URL,
-  ): ExtractPathParams<T> {
+  ): Handler.ExtractPathParams<T> {
     let uri: URL;
     let pathname: string;
     try {
@@ -154,7 +156,7 @@ class Handler {
       }
     });
 
-    return params as ExtractPathParams<T>;
+    return params as Handler.ExtractPathParams<T>;
   }
 }
 

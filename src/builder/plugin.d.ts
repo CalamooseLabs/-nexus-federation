@@ -1,3 +1,5 @@
-interface BuilderPluginOptions {
-  name: string;
+declare namespace BuilderPlugin {
+  interface Options {
+    name: string;
+  }
 }

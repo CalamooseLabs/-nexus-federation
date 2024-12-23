@@ -1,17 +1,27 @@
 // @ts-self-types="./router.d.ts"
 
-class Router implements Router {
-  #getRoutes: Map<string, (ctx: Context) => Promise<Response> | Response> =
-    new Map();
-  #postRoutes: Map<string, (ctx: Context) => Promise<Response> | Response> =
-    new Map();
+class Router {
+  #getRoutes: Map<
+    string,
+    (ctx: Kintsugi.Context) => Promise<Response> | Response
+  > = new Map();
+  #postRoutes: Map<
+    string,
+    (ctx: Kintsugi.Context) => Promise<Response> | Response
+  > = new Map();
   #staticPath: string | null = null;
 
-  get(path: string, handler: (ctx: Context) => Promise<Response> | Response) {
+  get(
+    path: string,
+    handler: (ctx: Kintsugi.Context) => Promise<Response> | Response,
+  ) {
     this.#getRoutes.set(path, handler);
   }
 
-  post(path: string, handler: (ctx: Context) => Promise<Response> | Response) {
+  post(
+    path: string,
+    handler: (ctx: Kintsugi.Context) => Promise<Response> | Response,
+  ) {
     this.#postRoutes.set(path, handler);
   }
 
@@ -38,7 +48,7 @@ class Router implements Router {
     return params;
   }
 
-  async #handleRequest(ctx: Context): Promise<Response> {
+  async #handleRequest(ctx: Kintsugi.Context): Promise<Response> {
     const req = ctx.req ?? (ctx.request as unknown as Request);
     const url = new URL(req.url ?? "");
     const path = url.pathname;
@@ -98,7 +108,7 @@ class Router implements Router {
   public listen() {
     Deno.serve((req) => {
       console.log("Router activated.");
-      return this.#handleRequest({ req } as unknown as Context);
+      return this.#handleRequest({ req } as unknown as Kintsugi.Context);
     });
   }
 

@@ -1,15 +1,19 @@
-type Routes = {
-  [path: string]: RoutePath;
-};
+declare namespace Handler {
+  type Routes = {
+    [path: string]: RoutePath;
+  };
 
-type RoutePath = `/${string}`;
+  type RoutePath = `/${string}`;
 
-type RouteHandlerFn = (ctx: AppContext) => Response | Promise<Response>;
+  type RouteHandlerFn = (
+    ctx: Kintsugi.AppContext,
+  ) => Response | Promise<Response>;
 
-type ExtractPathParams<T extends string> = T extends
-  `${infer Start}/${infer Rest}`
-  ? Start extends `:${infer Param}`
-    ? { [k in Param]: string } & ExtractPathParams<Rest>
-  : ExtractPathParams<Rest>
-  : T extends `:${infer Param}` ? { [k in Param]: string }
-  : Record<string, never>;
+  type ExtractPathParams<T extends string> = T extends
+    `${infer Start}/${infer Rest}`
+    ? Start extends `:${infer Param}`
+      ? { [k in Param]: string } & ExtractPathParams<Rest>
+    : ExtractPathParams<Rest>
+    : T extends `:${infer Param}` ? { [k in Param]: string }
+    : Record<string, never>;
+}

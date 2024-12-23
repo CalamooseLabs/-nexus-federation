@@ -24,9 +24,9 @@ class App {
 
   /**
    * Creates a new App instance with optional configuration.
-   * @param {AppConfig} [config] - Optional configuration object
+   * @param {Config.App} [config] - Optional configuration object
    */
-  constructor(config?: AppConfig) {
+  constructor(config?: Config.App) {
     this.#instance_id = crypto.randomUUID();
 
     this.#builder = new Builder();
@@ -55,32 +55,34 @@ class App {
   /**
    * Normalizes different context/request/response combinations into a standard AppContext.
    * @private
-   * @param {string} pathname - The route pathname
-   * @param {Context | MinRequest} reqOrCtx - Request or context object
-   * @param {MinResponse | MiddlewareNext} [resOrNext] - Response or next middleware function
-   * @param {MiddlewareNext} [next] - Next middleware function
-   * @returns {AppContext} Normalized context object
+   * @param {Kintsugi.NormalizeContextParams["pathname"]} pathname - The route pathname
+   * @param {Kintsugi.NormalizeContextParams["reqOrCtx"]} reqOrCtx - Request or context object
+   * @param {Kintsugi.NormalizeContextParams["resOrNextOrHandlerInfo"]} [resOrNextOrHandlerInfo] - Response or next middleware function
+   * @param {Kintsugi.NormalizeContextParams["next"]} [next] - Next middleware function
+   * @returns {Kintsugi.AppContext} Normalized context object
    * @throws {Error} When request is missing from context
    */
   #normalizeContext(
-    pathname: string,
-    reqOrCtx: Context | MinRequest,
-    resOrNextOrHandlerInfo?: MinResponse | MiddlewareNext | ServeHandlerInfo,
-    next?: MiddlewareNext,
-  ): AppContext {
-    const AppContext: AppContext = {} as AppContext;
+    pathname: Kintsugi.NormalizeContextParams["pathname"],
+    reqOrCtx: Kintsugi.NormalizeContextParams["reqOrCtx"],
+    resOrNextOrHandlerInfo?:
+      Kintsugi.NormalizeContextParams["resOrNextOrHandlerInfo"],
+    next?: Kintsugi.NormalizeContextParams["next"],
+  ): Kintsugi.AppContext {
+    const AppContext: Kintsugi.AppContext = {} as Kintsugi.AppContext;
 
-    let ctx: Context;
-    let req: MinRequest;
-    let resp: MinResponse | undefined;
-    let nextFn: MiddlewareNext | undefined;
+    let ctx: Kintsugi.Context;
+    let req: Kintsugi.MinRequest;
+    let resp: Kintsugi.MinResponse | undefined;
+    let nextFn: Kintsugi.MiddlewareNext | undefined;
 
     if (next) {
       // Then all params are provided meaning resOrNext is a response and reqOrCtx is a request
       // Three param overload
-      const n: MiddlewareNext = next as MiddlewareNext;
-      const r: MinResponse = resOrNextOrHandlerInfo as MinResponse;
-      const rq: MinRequest = reqOrCtx as MinRequest;
+      const n: Kintsugi.MiddlewareNext = next as Kintsugi.MiddlewareNext;
+      const r: Kintsugi.MinResponse =
+        resOrNextOrHandlerInfo as Kintsugi.MinResponse;
+      const rq: Kintsugi.MinRequest = reqOrCtx as Kintsugi.MinRequest;
 
       nextFn = n;
       resp = r;
@@ -91,21 +93,23 @@ class App {
       // Two param overload
       if (resOrNextOrHandlerInfo instanceof Function) {
         // Then it is a context and next is provided
-        const c: Context = reqOrCtx as Context;
-        const n: MiddlewareNext = resOrNextOrHandlerInfo as MiddlewareNext;
+        const c: Kintsugi.Context = reqOrCtx as Kintsugi.Context;
+        const n: Kintsugi.MiddlewareNext =
+          resOrNextOrHandlerInfo as Kintsugi.MiddlewareNext;
 
         nextFn = n;
         resp = c.response ?? c.resp;
-        req = (c.req ?? c.request) as MinRequest;
+        req = (c.req ?? c.request) as Kintsugi.MinRequest;
         ctx = c;
       } else {
         // Then it is a request and serve handler info is provided
-        const rq: MinRequest = reqOrCtx as MinRequest;
-        const _h: ServeHandlerInfo = resOrNextOrHandlerInfo as ServeHandlerInfo;
+        const rq: Kintsugi.MinRequest = reqOrCtx as Kintsugi.MinRequest;
+        const _h: Kintsugi.ServeHandlerInfo =
+          resOrNextOrHandlerInfo as Kintsugi.ServeHandlerInfo;
 
         nextFn = undefined;
         req = rq;
-        ctx = {} as Context;
+        ctx = {} as Kintsugi.Context;
       }
     } else {
       // Then only reqOrCtx is provided meaning it is a context
@@ -114,21 +118,21 @@ class App {
       //Decide if reqOrCtx is a context or a request
       if ("req" in reqOrCtx || "request" in reqOrCtx) {
         // Then it is a context
-        const c: Context = reqOrCtx as Context;
-        req = (c.req ?? c.request) as MinRequest;
+        const c: Kintsugi.Context = reqOrCtx as Kintsugi.Context;
+        req = (c.req ?? c.request) as Kintsugi.MinRequest;
         resp = c.resp ?? c.response;
         nextFn = c.next;
         ctx = c;
       } else {
         // Then it is a request
-        req = reqOrCtx as MinRequest;
-        ctx = {} as Context;
+        req = reqOrCtx as Kintsugi.MinRequest;
+        ctx = {} as Kintsugi.Context;
       }
     }
 
-    AppContext.req = req as MinRequest;
+    AppContext.req = req as Kintsugi.MinRequest;
     AppContext.method = req.method as HTTPMethod;
-    AppContext.next = nextFn as MiddlewareNext;
+    AppContext.next = nextFn as Kintsugi.MiddlewareNext;
     AppContext.params = this.#handler.getPathParams(pathname, req.url);
 
     // If no response is provided, we need to create a new response type object with custom methods
@@ -190,58 +194,66 @@ class App {
    * Universal middleware handler that processes incoming requests and routes them to appropriate federation handlers.
    * @private
    * @overload
-   * @param {Context} ctx - Context object containing request and response
-   * @returns {Promise<Response>} Response object
+   * @param {Kintsugi.MiddlewareParams["ctx"]} ctx - Context object containing request and response
+   * @returns {Kintsugi.MiddlewareParams["return"]} Response object
    */
-  async #middleware(ctx: Context): Promise<Response>;
+  async #middleware(
+    ctx: Kintsugi.MiddlewareParams["ctx"],
+  ): Kintsugi.MiddlewareParams["return"];
   /**
    * Universal middleware handler that processes incoming requests and routes them to appropriate federation handlers.
    * @private
    * @overload
-   * @param {MinRequest} req - Request object
-   * @returns {Promise<Response>} Response object
-   */
-  async #middleware(req: MinRequest): Promise<Response>;
-  /**
-   * @private
-   * @overload
-   * @param {Context} ctx - Context object containing request and response
-   * @param {MiddlewareNext} next - Next middleware function
-   * @returns {MiddlewareResponse} Promise resolving to void or Response
-   */
-  async #middleware(ctx: Context, next: MiddlewareNext): MiddlewareResponse;
-  /**
-   * @private
-   * @overload
-   * @param {MinRequest} req - Request object
-   * @param {ServeHandlerInfo} handlerInfo - Handler info object
-   * @returns {MiddlewareResponse} Promise resolving to void or Response
+   * @param {Kintsugi.MiddlewareParams["req"]} req - Request object
+   * @returns {Kintsugi.MiddlewareParams["return"]} Response object
    */
   async #middleware(
-    req: MinRequest,
-    handlerInfo: ServeHandlerInfo,
-  ): MiddlewareResponse;
+    req: Kintsugi.MiddlewareParams["req"],
+  ): Kintsugi.MiddlewareParams["return"];
   /**
    * @private
    * @overload
-   * @param {MinRequest} req - Request object
-   * @param {MinResponse} res - Response object
-   * @param {MiddlewareNext} next - Next middleware function
-   * @returns {MiddlewareResponse} Promise resolving to void or Response
+   * @param {Kintsugi.MiddlewareParams["ctx"]} ctx - Context object containing request and response
+   * @param {Kintsugi.MiddlewareParams["next"]} next - Next middleware function
+   * @returns {Kintsugi.MiddlewareParams["return"]} Promise resolving to void or Response
    */
   async #middleware(
-    req: MinRequest,
-    res: MinResponse,
-    next: MiddlewareNext,
-  ): MiddlewareResponse;
+    ctx: Kintsugi.MiddlewareParams["ctx"],
+    next: Kintsugi.MiddlewareParams["next"],
+  ): Kintsugi.MiddlewareParams["return"];
+  /**
+   * @private
+   * @overload
+   * @param {Kintsugi.MiddlewareParams["req"]} req - Request object
+   * @param {Kintsugi.MiddlewareParams["handlerInfo"]} handlerInfo - Handler info object
+   * @returns {Kintsugi.MiddlewareParams["return"]} Promise resolving to void or Response
+   */
+  async #middleware(
+    req: Kintsugi.MiddlewareParams["req"],
+    handlerInfo: Kintsugi.MiddlewareParams["handlerInfo"],
+  ): Kintsugi.MiddlewareParams["return"];
+  /**
+   * @private
+   * @overload
+   * @param {Kintsugi.MiddlewareParams["req"]} req - Request object
+   * @param {Kintsugi.MiddlewareParams["res"]} res - Response object
+   * @param {Kintsugi.MiddlewareParams["next"]} next - Next middleware function
+   * @returns {Kintsugi.MiddlewareParams["return"]} Promise resolving to void or Response
+   */
+  async #middleware(
+    req: Kintsugi.MiddlewareParams["req"],
+    res: Kintsugi.MiddlewareParams["res"],
+    next: Kintsugi.MiddlewareParams["next"],
+  ): Kintsugi.MiddlewareParams["return"];
 
   // The actual definition of the middleware function that needs to filter out the request/response/next params depending on the overload
   async #middleware(
-    reqOrCtx: Context | MinRequest,
-    resOrNextOrHandlerInfo?: MinResponse | MiddlewareNext | ServeHandlerInfo,
-    next?: MiddlewareNext,
-  ): Promise<void | Response> {
-    let ctx: AppContext;
+    reqOrCtx: Kintsugi.MiddlewareParams["reqOrCtx"],
+    resOrNextOrHandlerInfo?:
+      Kintsugi.MiddlewareParams["resOrNextOrHandlerInfo"],
+    next?: Kintsugi.MiddlewareParams["next"],
+  ): Kintsugi.MiddlewareParams["return"] {
+    let ctx: Kintsugi.AppContext;
 
     const matchedRoute = this.#handler.matchRoute(reqOrCtx);
 
@@ -263,7 +275,7 @@ class App {
       }
     }
 
-    return;
+    throw new Error("[Kintsugi] No route handler found");
   }
 
   /**
@@ -277,12 +289,12 @@ class App {
   /**
    * Fetch handler for use with default export for deno serve
    * @param {Request} request - The incoming request
-   * @param {ServeHandlerInfo} handlerInfo - The serve handler info
+   * @param {Kintsugi.ServeHandlerInfo} handlerInfo - The serve handler info
    * @returns {Promise<Response>} The response
    */
   public fetch: (
     request: Request,
-    handlerInfo: ServeHandlerInfo,
+    handlerInfo: Kintsugi.ServeHandlerInfo,
   ) => Promise<Response> = (request, handlerInfo) => {
     const response = this.#middleware(request, handlerInfo);
 

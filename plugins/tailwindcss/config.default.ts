@@ -1,6 +1,6 @@
 // @ts-self-types="./plugin.d.ts"
 
-export const defaultTailwindConfig: TailwindConfig = {
+export const defaultTailwindConfig: Tailwind.Config = {
   content: ["./**/*.{html,js,ts,tsx}"],
   theme: {
     extend: {},

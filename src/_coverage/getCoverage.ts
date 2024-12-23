@@ -60,8 +60,7 @@ async function runTests(type: string, coverageDir: string) {
 }
 
 export async function getFolder(args: string[]): Promise<void> {
-  const c = config as { version: string };
-  const version = c?.version ?? "unknown";
+  const version = (config as DenoJSON.Config)?.version ?? "unknown";
   const now = new Date();
   const timestamp = now.getFullYear().toString() +
     (now.getMonth() + 1).toString().padStart(2, "0") +

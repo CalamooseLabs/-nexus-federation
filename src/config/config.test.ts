@@ -7,7 +7,7 @@ Deno.test("Unit Tests:", async (subtest) => {
   await subtest.step("Constructor - No Arguments", () => {
     const config = new Config();
     assert(config instanceof Config);
-    assertEquals(config.version, (denoConfig as { version: string }).version);
+    assertEquals(config.version, (denoConfig as DenoJSON.Config).version);
   });
 
   await subtest.step("Constructor - With Arguments", () => {

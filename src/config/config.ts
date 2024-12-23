@@ -10,30 +10,30 @@ import { defaultConfig } from "./config.default.ts";
  * It will also be responsible for providing the manifest to the server.
  */
 class Config {
-  version: DefaultAppConfig["version"];
-  remoteMap: DefaultAppConfig["remoteMap"];
-  basePath: DefaultAppConfig["basePath"];
-  skipConsumer: DefaultAppConfig["skipConsumer"];
-  skipProvider: DefaultAppConfig["skipProvider"];
-  cacheTime: DefaultAppConfig["cacheTime"];
-  hostname: DefaultAppConfig["hostname"];
-  port: DefaultAppConfig["port"];
-  imports: DefaultAppConfig["imports"];
-  importMap: DefaultAppConfig["importMap"];
-  compilerOptions: DefaultAppConfig["compilerOptions"];
-  configLocation: DefaultAppConfig["configLocation"];
-  federation: DefaultAppConfig["federation"];
-  plugins: DefaultAppConfig["plugins"];
+  version: Config.App["version"];
+  remoteMap: Config.App["remoteMap"];
+  basePath: Config.App["basePath"];
+  skipConsumer: Config.App["skipConsumer"];
+  skipProvider: Config.App["skipProvider"];
+  cacheTime: Config.App["cacheTime"];
+  hostname: Config.App["hostname"];
+  port: Config.App["port"];
+  imports: Config.App["imports"];
+  importMap: Config.App["importMap"];
+  compilerOptions: Config.App["compilerOptions"];
+  configLocation: Config.App["configLocation"];
+  federation: Config.App["federation"];
+  plugins: Config.App["plugins"];
 
-  constructor(config?: AppConfig) {
+  constructor(config?: Config.App) {
     this.configLocation = config?.configLocation ??
       defaultConfig.configLocation;
 
-    let denoConfig: DenoConfig = null;
+    let denoConfig: DenoJSON.Config | null = null;
     // Read config file
     try {
-      const parsedConfig = parse(Deno.readTextFileSync(this.configLocation));
-      denoConfig = parsedConfig as DenoConfig;
+      const parsedConfig = parse(Deno.readTextFileSync(this.configLocation!));
+      denoConfig = parsedConfig as DenoJSON.Config;
     } catch {
       // Config file not found, using defaults
       denoConfig = {
