@@ -2,13 +2,11 @@ import config from "../deno.json" with { type: "json" };
 
 async function runTests(type: string, coverageDir: string) {
   let reportType: string;
-  const srcDir = `${Deno.cwd()}/src`;
+  const srcDir = `${Deno.cwd()}`;
   const args: string[] = [
     "test",
     `${srcDir}`,
-    "--allow-read",
-    "--allow-env",
-    "--allow-net",
+    "-REN",
   ];
 
   if (type === "all") {
@@ -62,7 +60,8 @@ async function runTests(type: string, coverageDir: string) {
 }
 
 export async function getFolder(args: string[]): Promise<void> {
-  const version = config?.version ?? "unknown";
+  const c = config as { version: string };
+  const version = c?.version ?? "unknown";
   const now = new Date();
   const timestamp = now.getFullYear().toString() +
     (now.getMonth() + 1).toString().padStart(2, "0") +
@@ -74,7 +73,7 @@ export async function getFolder(args: string[]): Promise<void> {
   const type = args.find((arg) => arg.includes("--"))?.replace("--", "");
 
   const coverageRoot =
-    `${Deno.cwd()}/coverage/${type}-tests/${version}/${timestamp}`;
+    `${Deno.cwd()}/_coverage/${type}-tests/${version}/${timestamp}`;
   await Deno.mkdir(coverageRoot, { recursive: true });
 
   await runTests(type as string, coverageRoot);

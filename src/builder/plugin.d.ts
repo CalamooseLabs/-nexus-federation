@@ -1,0 +1,3 @@
+interface BuilderPluginOptions {
+  name: string;
+}

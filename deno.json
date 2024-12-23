@@ -1,74 +1,23 @@
 {
-  "name": "@calamooselabs/kintsugi",
-  "description": "A lightweight JSX router and SSR/CSR renderer for Deno, inspired by module federation. It enables easy micro frontend setups, offering an intuitive API for modular architectures without complex configurations, perfect for streamlined Deno projects.",
-  "version": "0.0.1-alpha",
-  "license": "MIT",
-  "exports": {
-    ".": "./mod.ts",
-    "./types": "./types.ts",
-    "./app": "./src/app/mod.ts",
-    "./router": "./src/router/mod.ts"
-  },
-  "publish": {
-    "include": [
-      "deno.json",
-      "mod.ts",
-      "types.ts",
-      "import_map.json",
-      "README.md",
-      "src/**/*.ts",
-      "src/**/*.tsx",
-      "static/**/*"
-    ]
-  },
   "tasks": {
-    "check": {
-      "description": "Run Type Checking on Source Files",
-      "command": "deno check ./src/**/*.ts"
-    },
     "check-examples": {
       "description": "Run Type Checking on Examples",
       "command": "deno check ./examples/**/*.ts"
-    },
-    "unit-tests": {
-      "description": "Run Unit Tests",
-      "dependencies": ["check"],
-      "command": "deno test ./src/**/*.test.ts --filter Unit --allow-read"
-    },
-    "unit-tests-coverage": {
-      "description": "Run Unit Tests Coverage",
-      "command": "deno run -A ./coverage/getCoverage.ts --unit"
-    },
-    "integration-tests": {
-      "description": "Run Integration Tests",
-      "dependencies": ["check"],
-      "command": "deno test ./src/**/*.test.ts --filter Integration --allow-read --allow-env --allow-net"
-    },
-    "integration-tests-coverage": {
-      "description": "Run Integration Tests Coverage",
-      "command": "deno run -A ./coverage/getCoverage.ts --integration"
-    },
-    "all-tests": {
-      "description": "Run All Tests",
-      "dependencies": ["check"],
-      "command": "deno test ./src/**/*.test.ts --allow-read --allow-env --allow-net"
-    },
-    "all-tests-coverage": {
-      "description": "Run All Tests Coverage",
-      "command": "deno run -A ./coverage/getCoverage.ts --all"
     }
   },
-  "importMap": "./import_map.json",
   "compilerOptions": {
     "types": [
-      "./types.d.ts",
+      "./src/types.d.ts",
       "./src/app/app.d.ts",
       "./src/builder/builder.d.ts",
+      "./src/builder/plugin.d.ts",
       "./src/config/config.d.ts",
       "./src/handler/handler.d.ts",
       "./src/loader/loader.d.ts",
-      "./src/router/router.d.ts"
+      "./src/router/router.d.ts",
+      "./plugins/tailwindcss/plugin.d.ts"
     ]
   },
+  "workspace": ["./src", "./plugins/tailwindcss"],
   "lock": false
 }

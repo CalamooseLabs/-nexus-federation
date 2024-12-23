@@ -1,0 +1,22 @@
+{
+  "name": "@calamooselabs/tailwindcssplugin",
+  "description": "A plugin for TailwindCSS for the Kintsugi Framework.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "postcss": "npm:postcss",
+    "tailwindcss": "npm:tailwindcss",
+    "cssnano": "npm:cssnano",
+    "autoprefixer": "npm:autoprefixer",
+    "#kintsugi": "../../src/mod.ts"
+  },
+  "tasks": {
+    "check": {
+      "description": "Run Type Checking on Source Files",
+      "command": "deno check ./mod.ts"
+    }
+  }
+}

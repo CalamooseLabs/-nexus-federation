@@ -1,13 +1,13 @@
 import { assert, assertEquals } from "jsr:@std/assert";
 import { Config } from "#config";
 
-import denoConfig from "../../deno.json" with { type: "json" };
+import denoConfig from "../deno.json" with { type: "json" };
 
 Deno.test("Unit Tests:", async (subtest) => {
   await subtest.step("Constructor - No Arguments", () => {
     const config = new Config();
     assert(config instanceof Config);
-    assertEquals(config.version, denoConfig.version);
+    assertEquals(config.version, (denoConfig as { version: string }).version);
   });
 
   await subtest.step("Constructor - With Arguments", () => {

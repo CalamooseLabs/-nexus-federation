@@ -82,23 +82,32 @@ Deno.test("Unit Tests:", async (subtest) => {
 
       try {
         const handler = new Handler(new URL("../app/routes", import.meta.url));
-        
+
         // Test exact match
         assertEquals(
-          handler.matchRoute({ url: "/_federation/routes/users", method: "GET" }),
-          "/_federation/routes/users"
+          handler.matchRoute({
+            url: "/_federation/routes/users",
+            method: "GET",
+          }),
+          "/_federation/routes/users",
         );
 
         // Test parameter match
         assertEquals(
-          handler.matchRoute({ url: "/_federation/routes/users/123", method: "GET" }),
-          "/_federation/routes/users/:id"
+          handler.matchRoute({
+            url: "/_federation/routes/users/123",
+            method: "GET",
+          }),
+          "/_federation/routes/users/:id",
         );
 
         // Test no match
         assertEquals(
-          handler.matchRoute({ url: "/_federation/routes/invalid", method: "GET" }),
-          undefined
+          handler.matchRoute({
+            url: "/_federation/routes/invalid",
+            method: "GET",
+          }),
+          undefined,
         );
       } finally {
         // Restore original readDirSync
