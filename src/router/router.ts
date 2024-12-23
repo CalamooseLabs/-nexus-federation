@@ -3,24 +3,24 @@
 class Router {
   #getRoutes: Map<
     string,
-    (ctx: Kintsugi.Context) => Promise<Response> | Response
+    Router.Handler
   > = new Map();
   #postRoutes: Map<
     string,
-    (ctx: Kintsugi.Context) => Promise<Response> | Response
+    Router.Handler
   > = new Map();
   #staticPath: string | null = null;
 
   get(
     path: string,
-    handler: (ctx: Kintsugi.Context) => Promise<Response> | Response,
+    handler: Router.Handler,
   ) {
     this.#getRoutes.set(path, handler);
   }
 
   post(
     path: string,
-    handler: (ctx: Kintsugi.Context) => Promise<Response> | Response,
+    handler: Router.Handler,
   ) {
     this.#postRoutes.set(path, handler);
   }
@@ -48,7 +48,7 @@ class Router {
     return params;
   }
 
-  async #handleRequest(ctx: Kintsugi.Context): Promise<Response> {
+  async #handleRequest(ctx: Kintsugi.Context): Router.ExternalResponse {
     const req = ctx.req ?? (ctx.request as unknown as Request);
     const url = new URL(req.url ?? "");
     const path = url.pathname;

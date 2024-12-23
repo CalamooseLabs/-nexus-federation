@@ -14,7 +14,7 @@ class TailwindCSSPlugin extends BuilderPlugin {
 
   constructor(config?: Tailwind.Config, baseCSS?: string) {
     super({
-      name: "TailwindCSS",
+      name: "TailwindCSSPlugin",
     });
 
     this.#baseCSS = baseCSS ?? defaultBaseCSS;
