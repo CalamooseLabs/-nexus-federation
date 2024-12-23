@@ -2,7 +2,7 @@
   <i>Calamoose Labs Presents</i>
 </p>
 <p align="center">
-  <img height="250px" src="./static/logo.png" alt="Logo" />
+  <img height="250px" src="./static/kintsugi-logo.png" alt="Logo" />
 </p>
 <h1 align="center" style="color: gold;">
   <u>K I N T S U G I</u>
@@ -11,6 +11,10 @@
 </h1>
 
 ---
+
+THIS IS A WORK IN PROGRESS AND IS NOT READY FOR USE.
+
+THIS README WILL BE THE BASIC OVERVIEW OF THE PROJECT.
 
 ## License
 
