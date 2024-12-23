@@ -1,5 +1,5 @@
 import { Application } from "jsr:@oak/oak";
-import { App as InternalApp } from "#app";
+import { App as InternalApp } from "../../src/mod.ts";
 
 const app = new Application();
 

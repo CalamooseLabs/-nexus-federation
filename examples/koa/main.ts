@@ -1,6 +1,6 @@
 // @deno-types="npm:@types/koa@2.15.0"
 import Koa from "npm:koa@2.15.0";
-import { App as InternalApp } from "#app";
+import { App as InternalApp } from "../../src/mod.ts";
 
 const app = new Koa();
 

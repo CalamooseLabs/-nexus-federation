@@ -1,5 +1,5 @@
 import { Hono } from "jsr:@hono/hono";
-import { App as InternalApp } from "#app";
+import { App as InternalApp } from "../../src/mod.ts";
 
 const app = new Hono();
 

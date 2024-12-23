@@ -1,5 +1,5 @@
 import { App, type FreshContext } from "jsr:@fresh/core@2.0.0-alpha.25";
-import { App as InternalApp } from "#app";
+import { App as InternalApp } from "../../src/mod.ts";
 
 const app = new App();
 

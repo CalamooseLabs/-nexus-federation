@@ -12,11 +12,5 @@
     "cssnano": "npm:cssnano",
     "autoprefixer": "npm:autoprefixer",
     "#kintsugi": "../../src/mod.ts"
-  },
-  "tasks": {
-    "check": {
-      "description": "Run Type Checking on Source Files",
-      "command": "deno check ./mod.ts"
-    }
   }
 }

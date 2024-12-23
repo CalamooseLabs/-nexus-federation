@@ -3,8 +3,13 @@
     "check-examples": {
       "description": "Run Type Checking on Examples",
       "command": "deno check ./examples/**/*.ts"
+    },
+    "check": {
+      "description": "Run Type Checking on Source Files",
+      "command": "deno check ./**/*.ts"
     }
   },
+  "exclude": ["examples"],
   "compilerOptions": {
     "types": [
       "./src/types.d.ts",
@@ -19,5 +24,6 @@
     ]
   },
   "workspace": ["./src", "./plugins/tailwindcss"],
+  "nodeModulesDir": "none",
   "lock": false
 }

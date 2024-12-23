@@ -21,10 +21,6 @@
     ]
   },
   "tasks": {
-    "check": {
-      "description": "Run Type Checking on Source Files",
-      "command": "deno check ./**/*.ts"
-    },
     "unit-tests": {
       "description": "Run Unit Tests",
       "dependencies": ["check"],
