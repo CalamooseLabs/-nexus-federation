@@ -6,9 +6,9 @@
 **/.env.local
 
 # Coverage Test Results
-**/_coverage/unit-tests/*
-!**/_coverage/unit-tests/.gitkeep
-**/_coverage/integration-tests/*
-!**/_coverage/integration-tests/.gitkeep
-**/_coverage/all-tests/*
-!**/_coverage/all-tests/.gitkeep
+**/coverage/unit-tests/*
+!**/coverage/unit-tests/.gitkeep
+**/coverage/integration-tests/*
+!**/coverage/integration-tests/.gitkeep
+**/coverage/all-tests/*
+!**/coverage/all-tests/.gitkeep

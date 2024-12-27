@@ -72,7 +72,7 @@ export async function getFolder(args: string[]): Promise<void> {
   const type = args.find((arg) => arg.includes("--"))?.replace("--", "");
 
   const coverageRoot =
-    `${Deno.cwd()}/_coverage/${type}-tests/${version}/${timestamp}`;
+    `${Deno.cwd()}/coverage/${type}-tests/${version}/${timestamp}`;
   await Deno.mkdir(coverageRoot, { recursive: true });
 
   await runTests(type as string, coverageRoot);

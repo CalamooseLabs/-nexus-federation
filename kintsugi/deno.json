@@ -31,7 +31,7 @@
     },
     "unit-tests-coverage": {
       "description": "Run Unit Tests Coverage",
-      "command": "deno run -A ./_coverage/getCoverage.ts --unit"
+      "command": "deno run -A ./coverage/getCoverage.ts --unit"
     },
     "integration-tests": {
       "description": "Run Integration Tests",
@@ -40,7 +40,7 @@
     },
     "integration-tests-coverage": {
       "description": "Run Integration Tests Coverage",
-      "command": "deno run -A ./_coverage/getCoverage.ts --integration"
+      "command": "deno run -A ./coverage/getCoverage.ts --integration"
     },
     "all-tests": {
       "description": "Run All Tests",
@@ -49,7 +49,7 @@
     },
     "all-tests-coverage": {
       "description": "Run All Tests Coverage",
-      "command": "deno run -A ./_coverage/getCoverage.ts --all"
+      "command": "deno run -A ./coverage/getCoverage.ts --all"
     }
   },
   "imports": {
