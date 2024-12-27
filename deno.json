@@ -15,12 +15,10 @@
       "./kintsugi/types.d.ts",
       "./kintsugi/src/app/app.d.ts",
       "./kintsugi/src/builder/builder.d.ts",
-      "./kintsugi/src/builder/plugin.d.ts",
       "./kintsugi/src/config/config.d.ts",
       "./kintsugi/src/handler/handler.d.ts",
       "./kintsugi/src/loader/loader.d.ts",
-      "./kintsugi/src/router/router.d.ts",
-      "./packages/BuilderPlugin-TailwindCSSPlugin/plugin.d.ts"
+      "./kintsugi/src/router/router.d.ts"
     ]
   },
   "imports": {
@@ -35,8 +33,8 @@
     "./packages/Builder-PostCSS",
     "./packages/Builder-Rolldown",
     "./packages/Builder-RSPack",
+    "./packages/Builder-TailwindCSSPlugin",
     "./packages/Builder-Vite",
-    "./packages/BuilderPlugin-TailwindCSSPlugin",
     "./packages/Plugin-BasicAuth",
     "./packages/Plugin-Fresh"
   ],

@@ -1,5 +1,5 @@
 {
-  "name": "@calamooselabs/builderplugin-tailwindcss",
+  "name": "@calamooselabs/builder-tailwindcss",
   "description": "A plugin for TailwindCSS for the Kintsugi Framework.",
   "version": "0.0.1-alpha",
   "license": "MIT",
@@ -7,7 +7,6 @@
     ".": "./mod.ts"
   },
   "imports": {
-    "postcss": "npm:postcss",
     "tailwindcss": "npm:tailwindcss",
     "cssnano": "npm:cssnano",
     "autoprefixer": "npm:autoprefixer"

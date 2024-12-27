@@ -1,6 +1,6 @@
-// @ts-self-types="./plugin.d.ts"
+import type tailwindcss from "tailwindcss";
 
-export const defaultTailwindConfig: Tailwind.Config = {
+export const defaultTailwindConfig: tailwindcss.Config = {
   content: ["./**/*.{html,js,ts,tsx}"],
   theme: {
     extend: {},
