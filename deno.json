@@ -33,7 +33,7 @@
     "./packages/Builder-PostCSS",
     "./packages/Builder-Rolldown",
     "./packages/Builder-RSPack",
-    "./packages/Builder-TailwindCSSPlugin",
+    "./packages/Builder-TailwindCSS",
     "./packages/Builder-Vite",
     "./packages/Plugin-BasicAuth",
     "./packages/Plugin-Fresh"
