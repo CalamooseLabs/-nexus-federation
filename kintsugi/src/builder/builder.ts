@@ -17,11 +17,13 @@ export class Builder {
     return new Promise((resolve) => {
       resolve({
         code: "",
-        map: "",
-        warnings: [],
-        importURL: "",
-        chunks: {},
+        chunks: undefined,
       });
     });
+  }
+
+  #getImportUrl(bundledCode: string): string {
+    const importUrl = encodeURIComponent(bundledCode);
+    return `data:application/javascript;charset=utf-8,${importUrl}`;
   }
 }

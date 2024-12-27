@@ -25,11 +25,9 @@ export class ESBuildBuilder extends Builder {
       entryPoint,
       target,
       minify = true,
-      sourcemap = true,
       importMap = {} as KintsugiBuilder.BundleOptions["importMap"],
       compilerOptions,
       splitting = false,
-      outdir = "dist",
       externals = [],
     } = options;
 
@@ -68,13 +66,13 @@ export class ESBuildBuilder extends Builder {
       bundle: true,
       write: false,
       minify,
-      sourcemap,
+      sourcemap: true,
       format: "esm",
       target: target === "browser" ? ["es2020"] : [`deno${Deno.version.deno}`],
       platform: target === "browser" ? "browser" : "neutral",
       treeShaking: true,
       splitting,
-      outdir,
+      outdir: "dist",
       metafile: true,
       chunkNames: "chunks/[name]-[hash]",
       external: externalPatterns,
@@ -159,24 +157,19 @@ export class ESBuildBuilder extends Builder {
         );
       }
 
-      const sourceMap = sourcemap
-        ? outputFiles.find((f) => f.path.endsWith(".map"))?.text
-        : undefined;
-      const encodedCode = encodeURIComponent(bundledCode);
-
       return {
         code: bundledCode,
-        map: sourceMap,
-        warnings: result.warnings,
-        importURL: `data:application/javascript;charset=utf-8,${encodedCode}`,
         chunks: Object.keys(chunks).length > 0 ? chunks : undefined,
-        metafile: result.metafile,
       };
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Bundle failed: ${error.message}`);
+        throw new Error(
+          `[ESBuild-Builder]: Bundle failed\nError: ${error.message}`,
+        );
       } else {
-        throw new Error(`Bundle failed: ${JSON.stringify(error)}`);
+        throw new Error(
+          `[ESBuild-Builder]: Bundle failed\nError: ${JSON.stringify(error)}`,
+        );
       }
     } finally {
       esbuild.stop();
