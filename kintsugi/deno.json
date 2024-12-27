@@ -11,6 +11,7 @@
     "./config": "./src/config/mod.ts",
     "./handler": "./src/handler/mod.ts",
     "./loader": "./src/loader/mod.ts",
+    "./plugin": "./src/plugin/mod.ts",
     "./router": "./src/router/mod.ts"
   },
   "publish": {
