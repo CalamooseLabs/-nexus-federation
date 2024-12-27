@@ -12,18 +12,34 @@
   "exclude": ["examples"],
   "compilerOptions": {
     "types": [
-      "./src/types.d.ts",
-      "./src/app/app.d.ts",
-      "./src/builder/builder.d.ts",
-      "./src/builder/plugin.d.ts",
-      "./src/config/config.d.ts",
-      "./src/handler/handler.d.ts",
-      "./src/loader/loader.d.ts",
-      "./src/router/router.d.ts",
-      "./plugins/tailwindcss/plugin.d.ts"
+      "./kintsugi/types.d.ts",
+      "./kintsugi/src/app/app.d.ts",
+      "./kintsugi/src/builder/builder.d.ts",
+      "./kintsugi/src/builder/plugin.d.ts",
+      "./kintsugi/src/config/config.d.ts",
+      "./kintsugi/src/handler/handler.d.ts",
+      "./kintsugi/src/loader/loader.d.ts",
+      "./kintsugi/src/router/router.d.ts",
+      "./packages/BuilderPlugin-TailwindCSSPlugin/plugin.d.ts"
     ]
   },
-  "workspace": ["./src", "./plugins/tailwindcss"],
+  "imports": {
+    "@std/jsonc": "jsr:@std/jsonc",
+    "@std/fs": "jsr:@std/fs",
+    "@std/path": "jsr:@std/path"
+  },
+  "workspace": [
+    "./kintsugi",
+    "./packages/Builder-DenoEmit",
+    "./packages/Builder-ESBuild",
+    "./packages/Builder-PostCSS",
+    "./packages/Builder-Rolldown",
+    "./packages/Builder-RSPack",
+    "./packages/Builder-Vite",
+    "./packages/BuilderPlugin-TailwindCSSPlugin",
+    "./packages/Plugin-BasicAuth",
+    "./packages/Plugin-Fresh"
+  ],
   "nodeModulesDir": "none",
   "lock": false
 }

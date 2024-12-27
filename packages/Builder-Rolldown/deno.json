@@ -1,0 +1,12 @@
+{
+  "name": "@calamooselabs/builder-rolldown",
+  "description": "A plugin for Rolldown for the Kintsugi Framework.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "rollup": "npm:rolldown"
+  }
+}

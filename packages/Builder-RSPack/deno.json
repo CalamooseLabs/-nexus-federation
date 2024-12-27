@@ -1,0 +1,12 @@
+{
+  "name": "@calamooselabs/builder-rspack",
+  "description": "A plugin for RSPack for the Kintsugi Framework.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "rspack": "npm:rspack"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@calamooselabs/kintsugi-builder-esbuild",
+  "description": "A builder for Kintsugi that uses esbuild to bundle the code.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "esbuild": "npm:esbuild",
+    "@luca/esbuild-deno-loader": "jsr:@luca/esbuild-deno-loader"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "name": "@calamooselabs/kintsugi",
+  "description": "A lightweight JSX router and SSR/CSR renderer for Deno, inspired by module federation. It enables easy micro frontend setups, offering an intuitive API for modular architectures without complex configurations, perfect for streamlined Deno projects.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./types": "./types.d.ts",
+    "./app": "./src/app/mod.ts",
+    "./builder": "./src/builder/mod.ts",
+    "./config": "./src/config/mod.ts",
+    "./handler": "./src/handler/mod.ts",
+    "./loader": "./src/loader/mod.ts",
+    "./router": "./src/router/mod.ts"
+  },
+  "publish": {
+    "include": [
+      "deno.json",
+      "mod.ts",
+      "types.d.ts",
+      "README.md",
+      "./**/*.ts",
+      "./**/*.tsx"
+    ]
+  },
+  "tasks": {
+    "unit-tests": {
+      "description": "Run Unit Tests",
+      "dependencies": ["check"],
+      "command": "deno test ./**/*.test.ts --filter Unit -RE"
+    },
+    "unit-tests-coverage": {
+      "description": "Run Unit Tests Coverage",
+      "command": "deno run -A ./_coverage/getCoverage.ts --unit"
+    },
+    "integration-tests": {
+      "description": "Run Integration Tests",
+      "dependencies": ["check"],
+      "command": "deno test ./**/*.test.ts --filter Integration -REN"
+    },
+    "integration-tests-coverage": {
+      "description": "Run Integration Tests Coverage",
+      "command": "deno run -A ./_coverage/getCoverage.ts --integration"
+    },
+    "all-tests": {
+      "description": "Run All Tests",
+      "dependencies": ["check"],
+      "command": "deno test ./**/*.test.ts -REN"
+    },
+    "all-tests-coverage": {
+      "description": "Run All Tests Coverage",
+      "command": "deno run -A ./_coverage/getCoverage.ts --all"
+    }
+  },
+  "imports": {
+    "#app": "./src/app/mod.ts",
+    "#builder": "./src/builder/mod.ts",
+    "#config": "./src/config/mod.ts",
+    "#handler": "./src/handler/mod.ts",
+    "#loader": "./src/loader/mod.ts",
+    "#router": "./src/router/mod.ts"
+  }
+}

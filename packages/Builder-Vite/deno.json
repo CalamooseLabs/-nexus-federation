@@ -1,0 +1,12 @@
+{
+  "name": "@calamooselabs/builder-vite",
+  "description": "A plugin for Vite for the Kintsugi Framework.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "vite": "npm:vite"
+  }
+}

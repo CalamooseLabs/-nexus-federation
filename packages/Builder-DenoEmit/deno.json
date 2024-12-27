@@ -1,0 +1,12 @@
+{
+  "name": "@calamooselabs/builder-denoemit",
+  "description": "A plugin for DenoEmit for the Kintsugi Framework.",
+  "version": "0.0.1-alpha",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "deno-emit": "jsr:@deno-emit/deno-emit"
+  }
+}
